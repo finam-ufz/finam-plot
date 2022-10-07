@@ -1,0 +1,21 @@
+image: python
+
+stages:
+  - build
+  - deploy
+
+check:
+  stage: build
+  before_script:
+    - pip3 install black numpy pandas 'pylint<3' 'isort[colors]<6'
+  script:
+    - pip3 install --editable .[test]
+    - black --check --diff --color .
+    - isort --check --diff --color .
+    - pylint src/finam
+    - python -m pytest --cov finam_plot --cov-report term-missing --cov-report xml:cov.xml -v tests/
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: cov.xml
