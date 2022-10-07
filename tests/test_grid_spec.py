@@ -1,10 +1,8 @@
 import unittest
 from datetime import datetime, timedelta
 
-import matplotlib.pyplot as plt
 from finam.core.schedule import Composition
 from finam.data import Info, UniformGrid
-from finam.data.grid_tools import Location
 from finam.modules.generators import CallbackGenerator
 
 from finam_plot.grid_spec import GridSpecPlot
@@ -12,25 +10,34 @@ from finam_plot.grid_spec import GridSpecPlot
 
 class TestGridSpec(unittest.TestCase):
     def test_grid_spec(self):
-        info = Info(grid=UniformGrid((10, 7)), meta={"unit": "source_unit"})
+        info_1 = Info(grid=UniformGrid((10, 7)), meta={"unit": "source_unit"})
+        info_2 = Info(
+            grid=UniformGrid((6, 4), spacing=(1.5, 1.5, 1.5)),
+            meta={"unit": "source_unit"},
+        )
         source = CallbackGenerator(
             callbacks={
-                "Output": (
+                "Out1": (
                     lambda t: 1,
-                    info,
-                )
+                    info_1,
+                ),
+                "Out2": (
+                    lambda t: 1,
+                    info_2,
+                ),
             },
             start=datetime(2000, 1, 1),
             step=timedelta(days=1),
         )
 
-        plot = GridSpecPlot()
+        plot = GridSpecPlot({"In1": "black", "In2": "blue"})
 
         comp = Composition([source, plot])
         comp.initialize()
 
-        source.outputs["Output"] >> plot.inputs["GridSpec"]
+        source.outputs["Out1"] >> plot.inputs["In1"]
+        source.outputs["Out2"] >> plot.inputs["In2"]
 
         comp.run(datetime(2000, 1, 2))
 
-        self.assertEqual(plot._info, info)
+        self.assertEqual(plot._infos, {"In1": info_1, "In2": info_2})

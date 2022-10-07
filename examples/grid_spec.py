@@ -9,24 +9,32 @@ from finam.modules.generators import CallbackGenerator
 from finam_plot.grid_spec import GridSpecPlot
 
 if __name__ == "__main__":
-    info = Info(grid=UniformGrid((10, 7)), meta={"unit": "source_unit"})
+    info_1 = Info(grid=UniformGrid((10, 7)), meta={"unit": "source_unit"})
+    info_2 = Info(
+        grid=UniformGrid((6, 4), spacing=(1.345, 1.345, 1.345), origin=(1.345, 1.345, 1.345)), meta={"unit": "source_unit"}
+    )
     source = CallbackGenerator(
         callbacks={
-            "Output": (
+            "Out1": (
                 lambda t: 1,
-                info,
-            )
+                info_1,
+            ),
+            "Out2": (
+                lambda t: 1,
+                info_2,
+            ),
         },
         start=datetime(2000, 1, 1),
         step=timedelta(days=1),
     )
 
-    plot = GridSpecPlot()
+    plot = GridSpecPlot({"In1": "black", "In2": "blue"})
 
     comp = Composition([source, plot])
     comp.initialize()
 
-    source.outputs["Output"] >> plot.inputs["GridSpec"]
+    source.outputs["Out1"] >> plot.inputs["In1"]
+    source.outputs["Out2"] >> plot.inputs["In2"]
 
     comp.run(datetime(2000, 1, 2))
 

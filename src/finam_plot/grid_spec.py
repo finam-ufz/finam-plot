@@ -9,31 +9,39 @@ from finam.tools.connect_helper import ConnectHelper
 class GridSpecPlot(AComponent):
     """Plots the geometry of grid specifications"""
 
-    def __init__(self):
+    def __init__(self, inputs):
         super().__init__()
         self._figure = None
         self._connector: ConnectHelper = None
-        self._info: Info = None
+        self._input_colors = inputs
+        self._infos = {name: None for name, _col in self._input_colors.items()}
+
+        self.drawn = False
 
         self.status = ComponentStatus.CREATED
 
     def initialize(self):
         super().initialize()
 
-        self.inputs["GridSpec"] = CallbackInput(self._data_changed)
+        for name, _col in self._input_colors.items():
+            self.inputs[name] = CallbackInput(self._data_changed)
+
         self._connector = ConnectHelper(self.inputs, self.outputs)
 
         self.status = ComponentStatus.INITIALIZED
 
     def connect(self):
         super().connect()
-        self.status = self._connector.connect(
-            None, exchange_infos={"GridSpec": Info(grid=None, meta={"units": None})}
-        )
 
-        info = self._connector.in_infos["GridSpec"]
-        if info is not None:
-            self._info = info
+        exchange_infos = {}
+        for name, val in self._connector.in_infos.items():
+            if val is None:
+                exchange_infos[name] = Info(grid=None, meta={"units": None})
+        self.status = self._connector.connect(None, exchange_infos=exchange_infos)
+
+        for name, val in self._connector.in_infos.items():
+            if val is not None:
+                self._infos[name] = val
 
     def validate(self):
         super().validate()
@@ -43,23 +51,28 @@ class GridSpecPlot(AComponent):
     def update(self):
         super().update()
 
-        if self.status != ComponentStatus.VALIDATED:
+        if self.drawn or self.status != ComponentStatus.VALIDATED:
             return
+
+        self.drawn = True
 
         self._figure, axes = plt.subplots()
         axes.set_aspect("equal")
 
-        data_points = self._info.grid.data_points
-        points = self._info.grid.points
-        cells = self._info.grid.cells
+        for name, info in self._infos.items():
+            data_points = info.grid.data_points
+            points = info.grid.points
+            cells = info.grid.cells
 
-        for nodes in cells:
-            for i, node in enumerate(nodes):
-                pt1 = node
-                pt2 = points[nodes[(i + 1) % len(nodes)]]
-                axes.plot([pt1[0], pt2[0]], [pt1[1], pt2[1]], c="0.5", lw=0.5)
+            color = self._input_colors[name]
 
-        axes.scatter(*data_points.T, marker="+")
+            for nodes in cells:
+                for i, node in enumerate(nodes):
+                    pt1 = points[node]
+                    pt2 = points[nodes[(i + 1) % len(nodes)]]
+                    axes.plot([pt1[0], pt2[0]], [pt1[1], pt2[1]], c=color, lw=0.5)
+
+            axes.scatter(*data_points.T, marker="+", c=color)
 
         self._figure.show()
         self._figure.tight_layout()
