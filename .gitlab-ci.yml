@@ -12,7 +12,7 @@ check:
     - pip3 install --editable .[test]
     - black --check --diff --color .
     - isort --check --diff --color .
-    - pylint src/finam
+    - pylint src/finam_plot
     - python -m pytest --cov finam_plot --cov-report term-missing --cov-report xml:cov.xml -v tests/
   artifacts:
     reports:
