@@ -30,7 +30,7 @@ class TestGridSpec(unittest.TestCase):
             step=timedelta(days=1),
         )
 
-        plot = GridSpecPlot({"In1": "black", "In2": "blue"})
+        plot = GridSpecPlot(["In1", "In2"], axes=("y", "x"), colors=["black", "blue"])
 
         comp = Composition([source, plot])
         comp.initialize()

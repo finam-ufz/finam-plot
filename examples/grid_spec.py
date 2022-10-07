@@ -11,7 +11,13 @@ from finam_plot.grid_spec import GridSpecPlot
 if __name__ == "__main__":
     info_1 = Info(grid=UniformGrid((10, 7)), meta={"unit": "source_unit"})
     info_2 = Info(
-        grid=UniformGrid((6, 4), spacing=(1.345, 1.345, 1.345), origin=(1.345, 1.345, 1.345)), meta={"unit": "source_unit"}
+        grid=UniformGrid(
+            (6, 4),
+            spacing=(1.345, 1.345),
+            origin=(1.345, 1.345),
+            axes_increase=[True, False],
+        ),
+        meta={"unit": "source_unit"},
     )
     source = CallbackGenerator(
         callbacks={
@@ -28,7 +34,7 @@ if __name__ == "__main__":
         step=timedelta(days=1),
     )
 
-    plot = GridSpecPlot({"In1": "black", "In2": "blue"})
+    plot = GridSpecPlot(["In1", "In2"], axes=("x", "y"), colors=["black", "red"])
 
     comp = Composition([source, plot])
     comp.initialize()
