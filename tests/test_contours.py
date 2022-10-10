@@ -83,14 +83,14 @@ class TestContour(unittest.TestCase):
             step=timedelta(days=1),
         )
 
-        plot = ContourPlot(triangulate=False)
+        plot = ContourPlot(fill=True, triangulate=False)
 
         comp = Composition([source, plot])
         comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
-        comp.run(datetime(2000, 1, 2))
+        comp.run(datetime(2000, 1, 3))
 
         self.assertEqual(plot._info, info_1)
 

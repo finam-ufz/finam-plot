@@ -19,10 +19,12 @@ class ContourPlot(AComponent):
         super().__init__()
         self._time = None
         self._figure = None
+        self._plot_ax = None
         self._axes = axes
         self._triangulate = triangulate
         self._fill = fill
         self._info = None
+        self._contours = None
 
         self._connector: ConnectHelper = None
 
@@ -67,76 +69,74 @@ class ContourPlot(AComponent):
         try:
             data = self._inputs["Grid"].pull_data(self._time)
         except FinamNoDataError as e:
-            if (
-                self.status == ComponentStatus.VALIDATED
-                or self.status == ComponentStatus.INITIALIZED
-            ):
+            if self.status in (ComponentStatus.VALIDATED, ComponentStatus.INITIALIZED):
                 return
-            else:
-                with LogError(self.logger):
-                    raise e
+
+            with LogError(self.logger):
+                raise e
 
         if self._figure is None:
-            self._figure, axes = plt.subplots()
-            axes.set_aspect("equal")
+            self._figure, self._plot_ax = plt.subplots()
+            self._plot_ax.set_aspect("equal")
 
-            axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
-            axes_indices = [
-                ax if isinstance(ax, int) else axes_names[ax] for ax in list(self._axes)
-            ]
+        if self._contours is not None:
+            for tp in self._contours.collections:
+                tp.remove()
 
-            ax_1 = axes_indices[0]
-            ax_2 = axes_indices[1]
+        axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
+        axes_indices = [
+            ax if isinstance(ax, int) else axes_names[ax] for ax in list(self._axes)
+        ]
 
-            if isinstance(self._info.grid, UnstructuredGrid):
-                if self._info.grid.data_location == Location.POINTS:
-                    needs_triangulation = isinstance(
-                        self._info.grid, UnstructuredPoints
-                    ) or any(
-                        tp != CellType.TRI.value for tp in self._info.grid.cell_types
-                    )
+        ax_1 = axes_indices[0]
+        ax_2 = axes_indices[1]
 
-                    if needs_triangulation and not self._triangulate:
-                        with LogError(self.logger):
-                            raise ValueError(
-                                "Data requires triangulation. Use with `triangulate=True`"
-                            )
-
-                    if self._triangulate:
-                        tris = [
-                            Triangulation(*self._info.grid.data_points.T[[ax_1, ax_2]])
-                        ]
-                    else:
-                        tris = [
-                            *self._info.grid.data_points.T[[ax_1, ax_2]],
-                            self._info.grid.cells,
-                        ]
-
-                    data_flat = np.ascontiguousarray(
-                        data.pint.magnitude.reshape(-1, order=self._info.grid.order)
-                    )
-                    if self._fill:
-                        axes.tricontourf(*tris, data_flat)
-                    else:
-                        axes.tricontour(*tris, data_flat)
-                else:
-                    with LogError(self.logger):
-                        raise NotImplementedError(
-                            "Contour plots are not implemented for cell data"
-                        )
-            else:
-                with LogError(self.logger):
-                    raise NotImplementedError(
-                        "Contour plots are not implemented for regular grids"
-                    )
-
-            self._figure.show()
-            self._figure.tight_layout()
+        if isinstance(self._info.grid, UnstructuredGrid):
+            self._plot_unstructured(data, (ax_1, ax_2))
         else:
-            pass
+            with LogError(self.logger):
+                raise NotImplementedError(
+                    "Contour plots are not implemented for regular grids"
+                )
+
+        self._figure.show()
+        self._figure.tight_layout()
 
         self._figure.canvas.draw()
         self._figure.canvas.flush_events()
+
+    def _plot_unstructured(self, data, axes):
+        if self._info.grid.data_location == Location.POINTS:
+            needs_triangulation = isinstance(
+                self._info.grid, UnstructuredPoints
+            ) or any(tp != CellType.TRI.value for tp in self._info.grid.cell_types)
+
+            if needs_triangulation and not self._triangulate:
+                with LogError(self.logger):
+                    raise ValueError(
+                        "Data requires triangulation. Use with `triangulate=True`"
+                    )
+
+            if self._triangulate:
+                tris = [Triangulation(*self._info.grid.data_points.T[list(axes)])]
+            else:
+                tris = [
+                    *self._info.grid.data_points.T[list(axes)],
+                    self._info.grid.cells,
+                ]
+
+            data_flat = np.ascontiguousarray(
+                data.pint.magnitude.reshape(-1, order=self._info.grid.order)
+            )
+            if self._fill:
+                self._contours = self._plot_ax.tricontourf(*tris, data_flat)
+            else:
+                self._contours = self._plot_ax.tricontour(*tris, data_flat)
+        else:
+            with LogError(self.logger):
+                raise NotImplementedError(
+                    "Contour plots are not implemented for cell data"
+                )
 
     def _data_changed(self, _caller, time):
         if not isinstance(time, datetime):
