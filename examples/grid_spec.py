@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 from finam.core.schedule import Composition
 from finam.data import Info, UniformGrid
-from finam.data.grid_tools import Location
 from finam.modules.generators import CallbackGenerator
 
 from finam_plot.grid_spec import GridSpecPlot
