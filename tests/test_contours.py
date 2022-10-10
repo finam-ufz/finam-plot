@@ -11,6 +11,7 @@ from finam.data import Info, RectilinearGrid
 from finam.data.grid_spec import UnstructuredGrid, UnstructuredPoints
 from finam.data.grid_tools import CellType, Location
 from finam.modules.generators import CallbackGenerator
+from matplotlib.tri import Triangulation
 
 from finam_plot.contour import ContourPlot
 
@@ -53,7 +54,7 @@ class TestContour(unittest.TestCase):
 
         self.assertEqual(plot._info, info_1)
 
-    def test_contour_tris(self):
+    def test_contour_tris_points(self):
         reg = pint.UnitRegistry(force_ndarray_like=True)
 
         points = [[0, 0], [0, 1], [1, 0], [1, 1]]
@@ -91,6 +92,51 @@ class TestContour(unittest.TestCase):
         source.outputs["Out"] >> plot.inputs["Grid"]
 
         comp.run(datetime(2000, 1, 3))
+
+        self.assertEqual(plot._info, info_1)
+
+    def test_contour_tris_cells(self):
+        reg = pint.UnitRegistry(force_ndarray_like=True)
+
+        num_points = 100
+        points = np.random.uniform(0, 100, 2 * num_points).reshape((num_points, 2))
+        tris = Triangulation(*points.T)
+        cells = tris.get_masked_triangles()
+        info_1 = Info(
+            grid=UnstructuredGrid(
+                points=points,
+                cells=cells,
+                cell_types=[CellType.TRI.value] * len(cells),
+                data_location=Location.CELLS,
+            ),
+            meta={"unit": "source_unit"},
+        )
+        grid = xr.DataArray(np.zeros(shape=(len(cells),))).pint.quantify(reg.meter)
+
+        def generate_data(grid):
+            for i in range(len(cells)):
+                grid.data[i] = np.random.uniform(0.0, 1.0, 1) * grid.pint.units
+            return grid
+
+        source = CallbackGenerator(
+            callbacks={
+                "Out": (
+                    lambda t: generate_data(grid),
+                    info_1,
+                )
+            },
+            start=datetime(2000, 1, 1),
+            step=timedelta(days=1),
+        )
+
+        plot = ContourPlot(fill=True, triangulate=False)
+
+        comp = Composition([source, plot])
+        comp.initialize()
+
+        source.outputs["Out"] >> plot.inputs["Grid"]
+
+        comp.run(datetime(2000, 1, 10))
 
         self.assertEqual(plot._info, info_1)
 

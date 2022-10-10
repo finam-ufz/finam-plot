@@ -25,6 +25,7 @@ class ContourPlot(AComponent):
         self._fill = fill
         self._info = None
         self._contours = None
+        self.triangulation = None
 
         self._connector: ConnectHelper = None
 
@@ -80,8 +81,7 @@ class ContourPlot(AComponent):
             self._plot_ax.set_aspect("equal")
 
         if self._contours is not None:
-            for tp in self._contours.collections:
-                tp.remove()
+            self._plot_ax.clear()
 
         axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
         axes_indices = [
@@ -131,25 +131,60 @@ class ContourPlot(AComponent):
                         "Data requires triangulation. Use with `triangulate=True`"
                     )
 
-            if self._triangulate:
-                tris = [Triangulation(*self._info.grid.data_points.T[list(axes)])]
-            else:
-                tris = [
-                    *self._info.grid.data_points.T[list(axes)],
-                    self._info.grid.cells,
-                ]
+            if self.triangulation is None:
+                if self._triangulate:
+                    self.triangulation = [
+                        Triangulation(*self._info.grid.data_points.T[list(axes)])
+                    ]
+                else:
+                    self.triangulation = [
+                        *self._info.grid.data_points.T[list(axes)],
+                        self._info.grid.cells,
+                    ]
 
             data_flat = np.ascontiguousarray(
                 data.pint.magnitude.reshape(-1, order=self._info.grid.order)
             )
             if self._fill:
-                self._contours = self._plot_ax.tricontourf(*tris, data_flat)
+                self._contours = self._plot_ax.tricontourf(
+                    *self.triangulation, data_flat
+                )
             else:
-                self._contours = self._plot_ax.tricontour(*tris, data_flat)
+                self._contours = self._plot_ax.tricontour(
+                    *self.triangulation, data_flat
+                )
         else:
-            with LogError(self.logger):
-                raise NotImplementedError(
-                    "Contour plots are not implemented for cell data"
+            if self._fill:
+                tris_only = all(
+                    tp == CellType.TRI.value for tp in self._info.grid.cell_types
+                )
+
+                if not tris_only:
+                    with LogError(self.logger):
+                        raise NotImplementedError(
+                            "Contour plots for cell data are only supported for triangular meshes"
+                        )
+
+                data_flat = np.ascontiguousarray(
+                    data.pint.magnitude.reshape(-1, order=self._info.grid.order)
+                )
+
+                self._contours = self._plot_ax.tripcolor(
+                    *self._info.grid.points.T[list(axes)],
+                    data_flat,
+                    triangles=self._info.grid.cells,
+                )
+            else:
+                if self.triangulation is None:
+                    self.triangulation = [
+                        Triangulation(*self._info.grid.data_points.T[list(axes)])
+                    ]
+
+                data_flat = np.ascontiguousarray(
+                    data.pint.magnitude.reshape(-1, order=self._info.grid.order)
+                )
+                self._contours = self._plot_ax.tricontour(
+                    *self.triangulation, data_flat
                 )
 
     def _data_changed(self, _caller, time):
