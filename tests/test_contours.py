@@ -7,7 +7,7 @@ import pint
 import pint_xarray
 import xarray as xr
 from finam.core.schedule import Composition
-from finam.data import Info, UniformGrid
+from finam.data import Info, RectilinearGrid
 from finam.data.grid_spec import UnstructuredGrid, UnstructuredPoints
 from finam.data.grid_tools import CellType, Location
 from finam.modules.generators import CallbackGenerator
@@ -132,5 +132,50 @@ class TestContour(unittest.TestCase):
         source.outputs["Out"] >> plot.inputs["Grid"]
 
         comp.run(datetime(2000, 1, 2))
+
+        self.assertEqual(plot._info, info_1)
+
+    def test_contour_rectilinear(self):
+        reg = pint.UnitRegistry(force_ndarray_like=True)
+
+        info_1 = Info(
+            grid=RectilinearGrid(
+                axes=[
+                    np.array([0, 1, 3, 6, 9, 10, 11, 12]),
+                    np.array([2, 3, 4, 7, 8, 9, 10]),
+                ],
+                data_location=Location.POINTS,
+            ),
+            meta={"unit": "source_unit"},
+        )
+        grid = xr.DataArray(
+            np.zeros(shape=info_1.grid.data_shape, order=info_1.grid.order)
+        ).pint.quantify(reg.meter)
+
+        def generate_data(grid):
+            for i in range(len(info_1.grid.axes[0])):
+                for j in range(len(info_1.grid.axes[1])):
+                    grid.data[i, j] = np.random.uniform(0.0, 1.0, 1) * grid.pint.units
+            return grid
+
+        source = CallbackGenerator(
+            callbacks={
+                "Out": (
+                    lambda t: generate_data(grid),
+                    info_1,
+                )
+            },
+            start=datetime(2000, 1, 1),
+            step=timedelta(days=1),
+        )
+
+        plot = ContourPlot(triangulate=True)
+
+        comp = Composition([source, plot])
+        comp.initialize()
+
+        source.outputs["Out"] >> plot.inputs["Grid"]
+
+        comp.run(datetime(2000, 1, 5))
 
         self.assertEqual(plot._info, info_1)

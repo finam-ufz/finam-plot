@@ -94,16 +94,30 @@ class ContourPlot(AComponent):
         if isinstance(self._info.grid, UnstructuredGrid):
             self._plot_unstructured(data, (ax_1, ax_2))
         else:
-            with LogError(self.logger):
-                raise NotImplementedError(
-                    "Contour plots are not implemented for regular grids"
-                )
+            self._plot_structured(data, (ax_1, ax_2))
 
         self._figure.show()
         self._figure.tight_layout()
 
         self._figure.canvas.draw()
         self._figure.canvas.flush_events()
+
+    def _plot_structured(self, data, axes):
+        if axes == (0, 1):
+            if self._info.grid.order == "F":
+                data = data.transpose()
+        elif axes == (1, 0):
+            if self._info.grid.order == "C":
+                data = data.transpose()
+        else:
+            raise ValueError(f"Unsupported axes: {axes}")
+
+        data_axes = [self._info.grid.data_axes[i] for i in axes]
+
+        if self._fill:
+            self._contours = self._plot_ax.contourf(*data_axes, data.pint.magnitude)
+        else:
+            self._contours = self._plot_ax.contour(*data_axes, data.pint.magnitude)
 
     def _plot_unstructured(self, data, axes):
         if self._info.grid.data_location == Location.POINTS:
