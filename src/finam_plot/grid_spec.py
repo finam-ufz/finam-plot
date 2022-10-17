@@ -2,11 +2,8 @@
 import math
 
 import matplotlib.pyplot as plt
-from finam.core.interfaces import ComponentStatus
-from finam.core.sdk import AComponent, CallbackInput
-from finam.data import Info, UnstructuredPoints
+from finam import AComponent, CallbackInput, ComponentStatus, UnstructuredPoints
 from finam.data.grid_tools import StructuredGrid
-from finam.tools.connect_helper import ConnectHelper
 
 
 class GridSpecPlot(AComponent):
@@ -37,42 +34,29 @@ class GridSpecPlot(AComponent):
 
         self._infos = {name: None for name in self._names}
 
-        self._connector: ConnectHelper = None
         self.drawn = False
 
         self.status = ComponentStatus.CREATED
 
-    def initialize(self):
-        super().initialize()
-
+    def _initialize(self):
         for name in self._names:
-            self.inputs[name] = CallbackInput(self._data_changed)
+            self.inputs.add(
+                io=CallbackInput(
+                    name=name, callback=self._data_changed, grid=None, units=None
+                )
+            )
+        self.create_connector()
 
-        self._connector = ConnectHelper(self.inputs, self.outputs)
-
-        self.status = ComponentStatus.INITIALIZED
-
-    def connect(self):
-        super().connect()
-
-        exchange_infos = {}
-        for name, val in self._connector.in_infos.items():
-            if val is None:
-                exchange_infos[name] = Info(grid=None, meta={"units": None})
-        self.status = self._connector.connect(None, exchange_infos=exchange_infos)
-
+    def _connect(self):
+        self.try_connect()
         for name, val in self._connector.in_infos.items():
             if val is not None:
                 self._infos[name] = val
 
-    def validate(self):
-        super().validate()
+    def _validate(self):
+        pass
 
-        self.status = ComponentStatus.VALIDATED
-
-    def update(self):
-        super().update()
-
+    def _update(self):
         if self.drawn or self.status != ComponentStatus.VALIDATED:
             return
 
@@ -89,12 +73,8 @@ class GridSpecPlot(AComponent):
         self._figure.canvas.draw()
         self._figure.canvas.flush_events()
 
-        self.status = ComponentStatus.UPDATED
-
-    def finalize(self):
-        super().finalize()
-
-        self.status = ComponentStatus.FINALIZED
+    def _finalize(self):
+        pass
 
     def _plot_grid(self, axes, name):
         info = self._infos[name]

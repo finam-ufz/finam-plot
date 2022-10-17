@@ -1,15 +1,14 @@
 from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt
-from finam.core.schedule import Composition
-from finam.data import Info, UniformGrid
-from finam.data.grid_tools import Location
+import numpy as np
+from finam import UNITS, Composition, Info, UniformGrid
 from finam.modules.generators import CallbackGenerator
 
 from finam_plot.grid_spec import GridSpecPlot
 
 if __name__ == "__main__":
-    info_1 = Info(grid=UniformGrid((10, 7)), meta={"unit": "source_unit"})
+    info_1 = Info(grid=UniformGrid((10, 7)), units="m")
     info_2 = Info(
         grid=UniformGrid(
             (6, 4),
@@ -17,16 +16,22 @@ if __name__ == "__main__":
             origin=(1.345, 1.345),
             axes_increase=[True, False],
         ),
-        meta={"unit": "source_unit"},
+        units="m",
+    )
+    grid_1 = (
+        np.zeros(shape=info_1.grid.data_shape, order=info_1.grid.order) * UNITS.meter
+    )
+    grid_2 = (
+        np.zeros(shape=info_2.grid.data_shape, order=info_2.grid.order) * UNITS.meter
     )
     source = CallbackGenerator(
         callbacks={
             "Out1": (
-                lambda t: 1,
+                lambda t: grid_1,
                 info_1,
             ),
             "Out2": (
-                lambda t: 1,
+                lambda t: grid_2,
                 info_2,
             ),
         },
