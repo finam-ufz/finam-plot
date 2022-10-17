@@ -3,12 +3,18 @@ from datetime import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
-from finam.core.interfaces import ComponentStatus, FinamNoDataError
-from finam.core.sdk import AComponent, CallbackInput
-from finam.data import Info, UnstructuredGrid
-from finam.data.grid_spec import CellType, Location, UnstructuredPoints
-from finam.tools.connect_helper import ConnectHelper
-from finam.tools.log_helper import LogError
+from finam import (
+    AComponent,
+    CallbackInput,
+    CellType,
+    ComponentStatus,
+    FinamNoDataError,
+    Location,
+    UnstructuredGrid,
+    UnstructuredPoints,
+)
+from finam import data as fmd
+from finam.tools import LogError
 from matplotlib.tri import Triangulation
 
 
@@ -27,48 +33,37 @@ class ContourPlot(AComponent):
         self._contours = None
         self.triangulation = None
 
-        self._connector: ConnectHelper = None
-
         self.status = ComponentStatus.CREATED
 
-    def initialize(self):
-        super().initialize()
+    def _initialize(self):
+        self.inputs.add(
+            io=CallbackInput(
+                name="Grid", callback=self._data_changed, grid=None, units=None
+            )
+        )
+        self.create_connector()
 
-        self.inputs["Grid"] = CallbackInput(self._data_changed)
-        self._connector = ConnectHelper(self.inputs, self.outputs)
+    def _connect(self):
+        self.try_connect()
 
-        self.status = ComponentStatus.INITIALIZED
-
-    def connect(self):
-        super().connect()
-
-        exchange_infos = {"Grid": Info(grid=None, meta={"units": None})}
-        self.status = self._connector.connect(None, exchange_infos=exchange_infos)
-
-        in_info = self._connector.in_infos["Grid"]
+        in_info = self.connector.in_infos["Grid"]
         if in_info is not None:
             self._info = in_info
 
-    def validate(self):
-        super().validate()
+    def _validate(self):
+        pass
 
-        self.status = ComponentStatus.VALIDATED
-
-    def update(self):
-        super().update()
-
+    def _update(self):
         self._plot()
 
-        self.status = ComponentStatus.UPDATED
-
-    def finalize(self):
-        super().finalize()
-
-        self.status = ComponentStatus.FINALIZED
+    def _finalize(self):
+        pass
 
     def _plot(self):
         try:
-            data = self._inputs["Grid"].pull_data(self._time)
+            data = fmd.get_magnitude(
+                fmd.strip_time(self._inputs["Grid"].pull_data(self._time))
+            )
         except FinamNoDataError as e:
             if self.status in (ComponentStatus.VALIDATED, ComponentStatus.INITIALIZED):
                 return
@@ -115,9 +110,9 @@ class ContourPlot(AComponent):
         data_axes = [self._info.grid.data_axes[i] for i in axes]
 
         if self._fill:
-            self._contours = self._plot_ax.contourf(*data_axes, data.pint.magnitude)
+            self._contours = self._plot_ax.contourf(*data_axes, data)
         else:
-            self._contours = self._plot_ax.contour(*data_axes, data.pint.magnitude)
+            self._contours = self._plot_ax.contour(*data_axes, data)
 
     def _plot_unstructured(self, data, axes):
         if self._info.grid.data_location == Location.POINTS:
@@ -143,7 +138,7 @@ class ContourPlot(AComponent):
                     ]
 
             data_flat = np.ascontiguousarray(
-                data.pint.magnitude.reshape(-1, order=self._info.grid.order)
+                data.reshape(-1, order=self._info.grid.order)
             )
             if self._fill:
                 self._contours = self._plot_ax.tricontourf(
@@ -166,7 +161,7 @@ class ContourPlot(AComponent):
                         )
 
                 data_flat = np.ascontiguousarray(
-                    data.pint.magnitude.reshape(-1, order=self._info.grid.order)
+                    data.reshape(-1, order=self._info.grid.order)
                 )
 
                 self._contours = self._plot_ax.tripcolor(
@@ -181,7 +176,7 @@ class ContourPlot(AComponent):
                     ]
 
                 data_flat = np.ascontiguousarray(
-                    data.pint.magnitude.reshape(-1, order=self._info.grid.order)
+                    data.reshape(-1, order=self._info.grid.order)
                 )
                 self._contours = self._plot_ax.tricontour(
                     *self.triangulation, data_flat

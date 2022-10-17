@@ -1,8 +1,8 @@
 import unittest
 from datetime import datetime, timedelta
 
-from finam.core.schedule import Composition
-from finam.data import Info, UniformGrid
+import numpy as np
+from finam import UNITS, Composition, Info, UniformGrid
 from finam.modules.generators import CallbackGenerator
 
 from finam_plot.grid_spec import GridSpecPlot
@@ -10,19 +10,28 @@ from finam_plot.grid_spec import GridSpecPlot
 
 class TestGridSpec(unittest.TestCase):
     def test_grid_spec(self):
-        info_1 = Info(grid=UniformGrid((10, 7)), meta={"unit": "source_unit"})
+        info_1 = Info(grid=UniformGrid((10, 7)), units="m")
         info_2 = Info(
             grid=UniformGrid((6, 4), spacing=(1.5, 1.5, 1.5)),
-            meta={"unit": "source_unit"},
+            units="m",
         )
+        grid_1 = (
+            np.zeros(shape=info_1.grid.data_shape, order=info_1.grid.order)
+            * UNITS.meter
+        )
+        grid_2 = (
+            np.zeros(shape=info_2.grid.data_shape, order=info_2.grid.order)
+            * UNITS.meter
+        )
+
         source = CallbackGenerator(
             callbacks={
                 "Out1": (
-                    lambda t: 1,
+                    lambda t: grid_1,
                     info_1,
                 ),
                 "Out2": (
-                    lambda t: 1,
+                    lambda t: grid_2,
                     info_2,
                 ),
             },
