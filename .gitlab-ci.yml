@@ -1,19 +1,24 @@
 image: python
 
 stages:
-  - build
-  - deploy
+  - test
 
 check:
-  stage: build
+  stage: test
   before_script:
-    - pip3 install black numpy pandas 'pylint<3' 'isort[colors]<6'
+    - pip3 install black 'pylint<3' 'isort[colors]<6'
   script:
-    - pip3 install --editable .[test]
+    - pip3 install --editable .
     - black --check --diff --color .
     - isort --check --diff --color .
     - pylint src/finam_plot
+
+test:
+  stage: test
+  script:
+    - pip3 install --editable .[test]
     - python -m pytest --cov finam_plot --cov-report term-missing --cov-report xml:cov.xml -v tests/
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     reports:
       coverage_report:
