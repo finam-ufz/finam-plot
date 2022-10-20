@@ -4,9 +4,9 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 from finam import (
-    AComponent,
     CallbackInput,
     CellType,
+    Component,
     ComponentStatus,
     FinamNoDataError,
     Location,
@@ -14,11 +14,11 @@ from finam import (
     UnstructuredPoints,
 )
 from finam import data as fmd
-from finam.tools import LogError
+from finam.tools import ErrorLogger
 from matplotlib.tri import Triangulation
 
 
-class ContourPlot(AComponent):
+class ContourPlot(Component):
     """Plots contours"""
 
     def __init__(self, axes=(0, 1), fill=True, triangulate=False):
@@ -68,7 +68,7 @@ class ContourPlot(AComponent):
             if self.status in (ComponentStatus.VALIDATED, ComponentStatus.INITIALIZED):
                 return
 
-            with LogError(self.logger):
+            with ErrorLogger(self.logger):
                 raise e
 
         if self._figure is None:
@@ -121,7 +121,7 @@ class ContourPlot(AComponent):
             ) or any(tp != CellType.TRI.value for tp in self._info.grid.cell_types)
 
             if needs_triangulation and not self._triangulate:
-                with LogError(self.logger):
+                with ErrorLogger(self.logger):
                     raise ValueError(
                         "Data requires triangulation. Use with `triangulate=True`"
                     )
@@ -155,7 +155,7 @@ class ContourPlot(AComponent):
                 )
 
                 if not tris_only:
-                    with LogError(self.logger):
+                    with ErrorLogger(self.logger):
                         raise NotImplementedError(
                             "Contour plots for cell data are only supported for triangular meshes"
                         )
@@ -184,11 +184,11 @@ class ContourPlot(AComponent):
 
     def _data_changed(self, _caller, time):
         if not isinstance(time, datetime):
-            with LogError(self.logger):
+            with ErrorLogger(self.logger):
                 raise ValueError("Time must be of type datetime")
 
         self._time = time
         if self.status in (ComponentStatus.UPDATED, ComponentStatus.VALIDATED):
-            self.update()
+            self._update()
         else:
             self._plot()

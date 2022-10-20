@@ -2,11 +2,11 @@
 import math
 
 import matplotlib.pyplot as plt
-from finam import AComponent, CallbackInput, ComponentStatus, UnstructuredPoints
+from finam import CallbackInput, Component, ComponentStatus, UnstructuredPoints
 from finam.data.grid_tools import StructuredGrid
 
 
-class GridSpecPlot(AComponent):
+class GridSpecPlot(Component):
     """Plots the geometry of grid specifications"""
 
     def __init__(self, inputs, axes=(0, 1), colors="black"):
