@@ -42,7 +42,11 @@ class GridSpecPlot(Component):
         for name in self._names:
             self.inputs.add(
                 io=CallbackInput(
-                    name=name, callback=self._data_changed, grid=None, units=None
+                    name=name,
+                    callback=self._data_changed,
+                    time=None,
+                    grid=None,
+                    units=None,
                 )
             )
         self.create_connector()

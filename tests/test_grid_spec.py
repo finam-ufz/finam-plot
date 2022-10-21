@@ -10,8 +10,9 @@ from finam_plot.grid_spec import GridSpecPlot
 
 class TestGridSpec(unittest.TestCase):
     def test_grid_spec(self):
-        info_1 = Info(grid=UniformGrid((10, 7)), units="m")
+        info_1 = Info(time=None, grid=UniformGrid((10, 7)), units="m")
         info_2 = Info(
+            time=None,
             grid=UniformGrid((6, 4), spacing=(1.5, 1.5, 1.5)),
             units="m",
         )

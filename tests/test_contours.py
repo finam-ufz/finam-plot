@@ -22,6 +22,7 @@ class TestContour(unittest.TestCase):
     def test_contour_points(self):
         points = 100
         info_1 = Info(
+            time=None,
             grid=UnstructuredPoints(
                 np.random.uniform(0, 100, 2 * points).reshape((points, 2))
             ),
@@ -58,6 +59,7 @@ class TestContour(unittest.TestCase):
         points = [[0, 0], [0, 1], [1, 0], [1, 1]]
         cells = [[0, 1, 2], [1, 2, 3]]
         info_1 = Info(
+            time=None,
             grid=UnstructuredGrid(
                 points=points,
                 cells=cells,
@@ -99,6 +101,7 @@ class TestContour(unittest.TestCase):
         tris = Triangulation(*points.T)
         cells = tris.get_masked_triangles()
         info_1 = Info(
+            time=None,
             grid=UnstructuredGrid(
                 points=points,
                 cells=cells,
@@ -140,6 +143,7 @@ class TestContour(unittest.TestCase):
         points = [[0, 0], [0, 1], [1, 1], [1, 0]]
         cells = [[0, 1, 2, 3]]
         info_1 = Info(
+            time=None,
             grid=UnstructuredGrid(
                 points=points,
                 cells=cells,
@@ -177,6 +181,7 @@ class TestContour(unittest.TestCase):
 
     def test_contour_rectilinear(self):
         info_1 = Info(
+            time=None,
             grid=RectilinearGrid(
                 axes=[
                     np.array([0, 1, 3, 6, 9, 10, 11, 12]),
