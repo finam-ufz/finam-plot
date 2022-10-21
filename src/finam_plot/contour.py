@@ -33,8 +33,6 @@ class ContourPlot(Component):
         self._contours = None
         self.triangulation = None
 
-        self.status = ComponentStatus.CREATED
-
     def _initialize(self):
         self.inputs.add(
             io=CallbackInput(
