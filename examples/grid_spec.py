@@ -8,8 +8,9 @@ from finam.modules.generators import CallbackGenerator
 from finam_plot.grid_spec import GridSpecPlot
 
 if __name__ == "__main__":
-    info_1 = Info(grid=UniformGrid((10, 7)), units="m")
+    info_1 = Info(time=None, grid=UniformGrid((10, 7)), units="m")
     info_2 = Info(
+        time=None,
         grid=UniformGrid(
             (6, 4),
             spacing=(1.345, 1.345),

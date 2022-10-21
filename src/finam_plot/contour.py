@@ -38,7 +38,11 @@ class ContourPlot(Component):
     def _initialize(self):
         self.inputs.add(
             io=CallbackInput(
-                name="Grid", callback=self._data_changed, grid=None, units=None
+                name="Grid",
+                callback=self._data_changed,
+                time=None,
+                grid=None,
+                units=None,
             )
         )
         self.create_connector()
