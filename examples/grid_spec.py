@@ -1,17 +1,16 @@
 from datetime import datetime, timedelta
 
+import finam as fm
 import matplotlib.pyplot as plt
 import numpy as np
-from finam import UNITS, Composition, Info, UniformGrid
-from finam.modules.generators import CallbackGenerator
 
 from finam_plot.grid_spec import GridSpecPlot
 
 if __name__ == "__main__":
-    info_1 = Info(time=None, grid=UniformGrid((10, 7)), units="m")
-    info_2 = Info(
+    info_1 = fm.Info(time=None, grid=fm.UniformGrid((10, 7)), units="m")
+    info_2 = fm.Info(
         time=None,
-        grid=UniformGrid(
+        grid=fm.UniformGrid(
             (6, 4),
             spacing=(1.345, 1.345),
             origin=(1.345, 1.345),
@@ -20,12 +19,12 @@ if __name__ == "__main__":
         units="m",
     )
     grid_1 = (
-        np.zeros(shape=info_1.grid.data_shape, order=info_1.grid.order) * UNITS.meter
+        np.zeros(shape=info_1.grid.data_shape, order=info_1.grid.order) * fm.UNITS.meter
     )
     grid_2 = (
-        np.zeros(shape=info_2.grid.data_shape, order=info_2.grid.order) * UNITS.meter
+        np.zeros(shape=info_2.grid.data_shape, order=info_2.grid.order) * fm.UNITS.meter
     )
-    source = CallbackGenerator(
+    source = fm.modules.CallbackGenerator(
         callbacks={
             "Out1": (
                 lambda t: grid_1,
@@ -42,7 +41,7 @@ if __name__ == "__main__":
 
     plot = GridSpecPlot(["In1", "In2"], axes=("x", "y"), colors=["black", "red"])
 
-    comp = Composition([source, plot])
+    comp = fm.Composition([source, plot])
     comp.initialize()
 
     source.outputs["Out1"] >> plot.inputs["In1"]
