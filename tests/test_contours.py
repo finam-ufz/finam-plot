@@ -223,3 +223,48 @@ class TestContour(unittest.TestCase):
         comp.run(datetime(2000, 1, 5))
 
         self.assertEqual(plot._info, info_1)
+
+    def test_contour_lines(self):
+        info_1 = Info(
+            time=None,
+            grid=RectilinearGrid(
+                axes=[
+                    np.array([0, 1, 3, 6, 9, 10, 11, 12]),
+                    np.array([2, 3, 4, 7, 8, 9, 10]),
+                ],
+                data_location=Location.POINTS,
+            ),
+            units="m",
+        )
+        grid = (
+            np.zeros(shape=info_1.grid.data_shape, order=info_1.grid.order)
+            * UNITS.meter
+        )
+
+        def generate_data(grid):
+            for i in range(len(info_1.grid.axes[0])):
+                for j in range(len(info_1.grid.axes[1])):
+                    grid[i, j] = np.random.uniform(0.0, 1.0, 1) * UNITS.meter
+            return grid
+
+        source = CallbackGenerator(
+            callbacks={
+                "Out": (
+                    lambda t: generate_data(grid),
+                    info_1,
+                )
+            },
+            start=datetime(2000, 1, 1),
+            step=timedelta(days=1),
+        )
+
+        plot = ContourPlot(fill=False, triangulate=True)
+
+        comp = Composition([source, plot])
+        comp.initialize()
+
+        source.outputs["Out"] >> plot.inputs["Grid"]
+
+        comp.run(datetime(2000, 1, 5))
+
+        self.assertEqual(plot._info, info_1)
