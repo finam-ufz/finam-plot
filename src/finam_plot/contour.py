@@ -1,24 +1,13 @@
 """Components for contour plots"""
 from datetime import datetime
 
+import finam as fm
 import matplotlib.pyplot as plt
 import numpy as np
-from finam import (
-    CallbackInput,
-    CellType,
-    Component,
-    ComponentStatus,
-    FinamNoDataError,
-    Location,
-    UnstructuredGrid,
-    UnstructuredPoints,
-)
-from finam import data as fmd
-from finam.tools import ErrorLogger
 from matplotlib.tri import Triangulation
 
 
-class ContourPlot(Component):
+class ContourPlot(fm.Component):
     """Plots contours"""
 
     def __init__(self, axes=(0, 1), limits=(None, None), fill=True, triangulate=False):
@@ -37,7 +26,7 @@ class ContourPlot(Component):
 
     def _initialize(self):
         self.inputs.add(
-            io=CallbackInput(
+            io=fm.CallbackInput(
                 name="Grid",
                 callback=self._data_changed,
                 time=None,
@@ -65,14 +54,17 @@ class ContourPlot(Component):
 
     def _plot(self):
         try:
-            data = fmd.get_magnitude(
-                fmd.strip_time(self._inputs["Grid"].pull_data(self._time))
+            data = fm.data.get_magnitude(
+                fm.data.strip_time(self._inputs["Grid"].pull_data(self._time))
             )
-        except FinamNoDataError as e:
-            if self.status in (ComponentStatus.VALIDATED, ComponentStatus.INITIALIZED):
+        except fm.FinamNoDataError as e:
+            if self.status in (
+                fm.ComponentStatus.VALIDATED,
+                fm.ComponentStatus.INITIALIZED,
+            ):
                 return
 
-            with ErrorLogger(self.logger):
+            with fm.tools.ErrorLogger(self.logger):
                 raise e
 
         if self._figure is None:
@@ -90,7 +82,7 @@ class ContourPlot(Component):
         ax_1 = axes_indices[0]
         ax_2 = axes_indices[1]
 
-        if isinstance(self._info.grid, UnstructuredGrid):
+        if isinstance(self._info.grid, fm.UnstructuredGrid):
             self._plot_unstructured(data, (ax_1, ax_2))
         else:
             self._plot_structured(data, (ax_1, ax_2))
@@ -123,13 +115,13 @@ class ContourPlot(Component):
             )
 
     def _plot_unstructured(self, data, axes):
-        if self._info.grid.data_location == Location.POINTS:
+        if self._info.grid.data_location == fm.Location.POINTS:
             needs_triangulation = isinstance(
-                self._info.grid, UnstructuredPoints
-            ) or any(tp != CellType.TRI.value for tp in self._info.grid.cell_types)
+                self._info.grid, fm.UnstructuredPoints
+            ) or any(tp != fm.CellType.TRI.value for tp in self._info.grid.cell_types)
 
             if needs_triangulation and not self._triangulate:
-                with ErrorLogger(self.logger):
+                with fm.tools.ErrorLogger(self.logger):
                     raise ValueError(
                         "Data requires triangulation. Use with `triangulate=True`"
                     )
@@ -159,11 +151,11 @@ class ContourPlot(Component):
         else:
             if self._fill:
                 tris_only = all(
-                    tp == CellType.TRI.value for tp in self._info.grid.cell_types
+                    tp == fm.CellType.TRI.value for tp in self._info.grid.cell_types
                 )
 
                 if not tris_only:
-                    with ErrorLogger(self.logger):
+                    with fm.tools.ErrorLogger(self.logger):
                         raise NotImplementedError(
                             "Contour plots for cell data are only supported for triangular meshes"
                         )
@@ -194,11 +186,11 @@ class ContourPlot(Component):
 
     def _data_changed(self, _caller, time):
         if not isinstance(time, datetime):
-            with ErrorLogger(self.logger):
+            with fm.tools.ErrorLogger(self.logger):
                 raise ValueError("Time must be of type datetime")
 
         self._time = time
-        if self.status in (ComponentStatus.UPDATED, ComponentStatus.VALIDATED):
+        if self.status in (fm.ComponentStatus.UPDATED, fm.ComponentStatus.VALIDATED):
             self._update()
         else:
             self._plot()

@@ -1,4 +1,4 @@
-"""Components for image plots"""
+"""Raster image plot component for uniform grids."""
 from datetime import datetime
 
 import finam as fm
@@ -7,7 +7,7 @@ import numpy as np
 
 
 class ImagePlot(fm.Component):
-    """Raster image plot"""
+    """Raster image plot component for uniform grids."""
 
     def __init__(self, limits=(None, None), axes=(0, 1)):
         super().__init__()
