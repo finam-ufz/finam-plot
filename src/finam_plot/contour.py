@@ -35,14 +35,33 @@ class ContourPlot(fm.Component):
     Note:
         This component is push-based without an internal time step.
 
+    Examples
+    --------
+
+    .. testcode:: constructor
+
+        import finam_plot as fmp
+
+        plot = fmp.ContourPlot(
+            axes=(0, 1),
+            fill=False,
+            triangulate=True,
+            vmin=0, vmax=1, cmap="hsv", # plot kwargs
+        )
+
+    .. testcode:: constructor
+        :hide:
+
+        plot.initialize()
+
     Parameters
     ----------
-    axes : (int, int) or (str, str)
-        Tuple of axes indices or names.
-    fill : bool
-        Whether to draw filled contours.
-    triangulate : bool
-        Allow/force triangulation.
+    axes : (int, int) or (str, str), optional
+        Tuple of axes indices or names. Default (0, 1).
+    fill : bool, optional
+        Whether to draw filled contours. Default ``True``.
+    triangulate : bool, optional
+        Allow/force triangulation. Default ``False``.
     **plot_kwargs
         Keyword arguments passed to plot function. See the list of functions above.
     """

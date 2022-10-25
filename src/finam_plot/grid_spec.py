@@ -21,6 +21,24 @@ class GridSpecPlot(fm.Component):
     Note:
         This component is push-based without an internal time step.
 
+    Examples
+    --------
+
+    .. testcode:: constructor
+
+        import finam_plot as fmp
+
+        plot = fmp.GridSpecPlot(
+            axes=(0, 1),
+            inputs=["Grid1", "Grid2"],
+            colors=["red", "#ff00ee"],
+        )
+
+    .. testcode:: constructor
+        :hide:
+
+        plot.initialize()
+
     Parameters
     ----------
     inputs : list

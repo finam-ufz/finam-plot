@@ -24,6 +24,24 @@ class SchedulePlot(fm.Component):
     Note:
         This component is push-based without an internal time step.
 
+    Examples
+    --------
+
+    .. testcode:: constructor
+
+        import finam_plot as fmp
+
+        plot = fmp.SchedulePlot(
+            inputs=["Grid1", "Grid2"],
+            colors=["red", "#ff00ee"],
+            marker="o", lw=2.0, # plot kwargs
+        )
+
+    .. testcode:: constructor
+        :hide:
+
+        plot.initialize()
+
     Parameters
     ----------
     inputs : list of str

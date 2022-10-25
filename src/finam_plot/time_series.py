@@ -24,6 +24,24 @@ class TimeSeriesPlot(fm.Component):
     Note:
         This component is push-based without an internal time step.
 
+    Examples
+    --------
+
+    .. testcode:: constructor
+
+        import finam_plot as fmp
+
+        plot = fmp.TimeSeriesPlot(
+            inputs=["Value1", "Value2"],
+            colors=["red", "#ff00ee"],
+            marker="o", lw=2.0, # plot kwargs
+        )
+
+    .. testcode:: constructor
+        :hide:
+
+        plot.initialize()
+
     Parameters
     ----------
     inputs : list of str
@@ -172,6 +190,27 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         --> [custom] | TimeSeriesPlot |
         --> [......] |                |
                      +----------------+
+
+    Examples
+    --------
+
+    .. testcode:: constructor
+
+        import datetime as dt
+        import finam_plot as fmp
+
+        plot = fmp.StepTimeSeriesPlot(
+            inputs=["Value1", "Value2"],
+            colors=["red", "#ff00ee"],
+            start=dt.datetime(2000, 1, 1),
+            step=dt.timedelta(days=1),
+            marker="o", lw=2.0, # plot kwargs
+        )
+
+    .. testcode:: constructor
+        :hide:
+
+        plot.initialize()
 
     Parameters
     ----------

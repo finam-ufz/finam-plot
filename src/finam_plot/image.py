@@ -24,10 +24,27 @@ class ImagePlot(fm.Component):
     Note:
         This component is push-based without an internal time step.
 
+    Examples
+    --------
+
+    .. testcode:: constructor
+
+        import finam_plot as fmp
+
+        plot = fmp.ImagePlot(
+            axes=(0, 1),
+            vmin=0, vmax=1, cmap="hsv", # plot kwargs
+        )
+
+    .. testcode:: constructor
+        :hide:
+
+        plot.initialize()
+
     Parameters
     ----------
-    axes : (int, int) or (str, str)
-        Tuple of axes indices or names.
+    axes : (int, int) or (str, str), optional
+        Tuple of axes indices or names. Default (0, 1).
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.imshow`.
     """
