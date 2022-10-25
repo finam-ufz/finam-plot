@@ -22,7 +22,7 @@ class ContourPlot(fm.Component):
       * Filled: :func:`matplotlib.pyplot.tripcolor`
       * Not filled: :func:`matplotlib.pyplot.tricontour`
 
-    Filled unstructured cell data with quads is currently not supported.
+    Unstructured cell data with quads is currently not supported with ``fill=True``.
 
     .. code-block:: text
 

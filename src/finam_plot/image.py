@@ -9,7 +9,7 @@ import numpy as np
 class ImagePlot(fm.Component):
     """Raster image plot component for uniform grids.
 
-    Data must be of grid type :class:`finam.UniformGrid`.
+    Data must be of grid type :class:`finam.UniformGrid` or :class:`finam.EsriGrid`.
 
     Uses :func:`matplotlib.pyplot.imshow`.
 
