@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import finam as fm
+import matplotlib.pyplot as plt
 import numpy as np
 
 from finam_plot import ColorMeshPlot
@@ -31,3 +32,6 @@ if __name__ == "__main__":
     trigger.outputs["Out"] >> plot.inputs["Grid"]
 
     comp.run(datetime(2001, 1, 1))
+
+    plt.ion()
+    plt.show(block=True)
