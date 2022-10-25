@@ -1,9 +1,13 @@
-"""FINAM components for plotting spatial and temporal data
+"""
+FINAM components for plotting spatial and temporal data.
 
 .. toctree::
    :hidden:
 
    self
+
+Components
+==========
 
 .. autosummary::
    :toctree: generated
@@ -13,6 +17,11 @@
     ContourPlot
     GridSpecPlot
     ImagePlot
+
+.. autosummary::
+   :toctree: generated
+   :caption: Adapters
+
 """
 from .colormesh import ColorMeshPlot
 from .contour import ContourPlot

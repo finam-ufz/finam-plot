@@ -94,7 +94,9 @@ html_theme_options = {
             "attributes": {"target": "_blank"},
         },
     ],
-    "external_links": [],
+    "external_links": [
+        {"name": "FINAM documentation", "url": "https://finam.pages.ufz.de/finam"},
+    ],
 }
 
 # Example configuration for intersphinx: refer to the Python standard library.

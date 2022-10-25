@@ -31,6 +31,11 @@ wheels/
 *.manifest
 *.spec
 
+# Sphinx documentation
+docs/_build/
+docs/source/api/generated
+docs/output.txt
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt

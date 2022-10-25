@@ -1,9 +1,27 @@
+.. :html_theme.sidebar_secondary.remove: true
+
 ==========
 FINAM Plot
 ==========
 
-.. automodule:: finam_plot
+Live plotting components for FINAM.
 
-.. raw:: latex
+Usage
+-----
 
-    \clearpage
+API References
+--------------
+
+Information about the API of FINAM-plot.
+
+.. toctree::
+    :hidden:
+    :maxdepth: 1
+
+    self
+
+.. toctree::
+    :maxdepth: 1
+
+    api/index
+
