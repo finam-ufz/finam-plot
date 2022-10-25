@@ -12,6 +12,17 @@ class ContourPlot(fm.Component):
 
     Data must be of grid and FINAM grid type.
 
+    .. code-block:: text
+
+                   +-------------+
+                   |             |
+        --> [Grid] | ContourPlot |
+                   |             |
+                   +-------------+
+
+    Note:
+        This component is push-based without an internal time step.
+
     Parameters
     ----------
     limits : tuple of (float, float), optional
