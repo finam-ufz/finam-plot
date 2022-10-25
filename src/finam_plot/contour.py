@@ -21,7 +21,7 @@ from matplotlib.tri import Triangulation
 class ContourPlot(Component):
     """Plots contours"""
 
-    def __init__(self, axes=(0, 1), fill=True, triangulate=False):
+    def __init__(self, axes=(0, 1), limits=(None, None), fill=True, triangulate=False):
         super().__init__()
         self._time = None
         self._figure = None
@@ -32,6 +32,8 @@ class ContourPlot(Component):
         self._info = None
         self._contours = None
         self.triangulation = None
+        self.vmin = limits[0]
+        self.vmax = limits[1]
 
     def _initialize(self):
         self.inputs.add(
@@ -112,9 +114,13 @@ class ContourPlot(Component):
         data_axes = [self._info.grid.data_axes[i] for i in axes]
 
         if self._fill:
-            self._contours = self._plot_ax.contourf(*data_axes, data)
+            self._contours = self._plot_ax.contourf(
+                *data_axes, data, vmin=self.vmin, vmax=self.vmax
+            )
         else:
-            self._contours = self._plot_ax.contour(*data_axes, data)
+            self._contours = self._plot_ax.contour(
+                *data_axes, data, vmin=self.vmin, vmax=self.vmax
+            )
 
     def _plot_unstructured(self, data, axes):
         if self._info.grid.data_location == Location.POINTS:
@@ -144,11 +150,11 @@ class ContourPlot(Component):
             )
             if self._fill:
                 self._contours = self._plot_ax.tricontourf(
-                    *self.triangulation, data_flat
+                    *self.triangulation, data_flat, vmin=self.vmin, vmax=self.vmax
                 )
             else:
                 self._contours = self._plot_ax.tricontour(
-                    *self.triangulation, data_flat
+                    *self.triangulation, data_flat, vmin=self.vmin, vmax=self.vmax
                 )
         else:
             if self._fill:
@@ -170,6 +176,8 @@ class ContourPlot(Component):
                     *self._info.grid.points.T[list(axes)],
                     data_flat,
                     triangles=self._info.grid.cells,
+                    vmin=self.vmin,
+                    vmax=self.vmax,
                 )
             else:
                 if self.triangulation is None:
@@ -181,7 +189,7 @@ class ContourPlot(Component):
                     data.reshape(-1, order=self._info.grid.order)
                 )
                 self._contours = self._plot_ax.tricontour(
-                    *self.triangulation, data_flat
+                    *self.triangulation, data_flat, vmin=self.vmin, vmax=self.vmax
                 )
 
     def _data_changed(self, _caller, time):

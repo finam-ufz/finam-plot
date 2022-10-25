@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
 
 import finam as fm
+import numpy as np
 
-from finam_plot import ImagePlot
+from finam_plot import ContourPlot
 
 if __name__ == "__main__":
     grid = fm.UniformGrid((30, 20))
@@ -19,12 +20,12 @@ if __name__ == "__main__":
         step=timedelta(days=1),
         in_info=fm.Info(time=None, grid=None, units=None),
     )
-    plot = ImagePlot(limits=(-1, 1))
+    plot = ContourPlot(limits=(-1, 1))
 
     comp = fm.Composition([source, trigger, plot])
     comp.initialize()
 
     source.outputs["Noise"] >> trigger.inputs["In"]
-    trigger.outputs["Out"] >> plot.inputs["Image"]
+    trigger.outputs["Out"] >> plot.inputs["Grid"]
 
     comp.run(datetime(2001, 1, 1))
