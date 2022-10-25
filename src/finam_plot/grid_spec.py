@@ -27,11 +27,11 @@ class GridSpecPlot(fm.Component):
         List on input names.
     axes : (int, int) or (str, str), optional
         Tuple of axes indices or names. Default (0, 1).
-    colors : list od str or str, optional
-        Colors to use for the inputs, or a single color. Default "black".
+    colors : list of str, optional
+        List of colors for the inputs. Uses matplotlib default colors by default.
     """
 
-    def __init__(self, inputs, axes=(0, 1), colors="black"):
+    def __init__(self, inputs, axes=(0, 1), colors=None):
         super().__init__()
         self._figure = None
         self._names = inputs
@@ -45,14 +45,7 @@ class GridSpecPlot(fm.Component):
         else:
             self._axes = dict(zip(self._names, [axes] * len(self._names)))
 
-        if isinstance(colors, list):
-            if len(colors) != len(self._names):
-                raise ValueError(
-                    "Colors must be a string or a list of strings with the same length as the inputs"
-                )
-            self._colors = dict(zip(self._names, colors))
-        else:
-            self._colors = dict(zip(self._names, [colors] * len(self._names)))
+        self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
         self._infos = {name: None for name in self._names}
 
@@ -89,8 +82,8 @@ class GridSpecPlot(fm.Component):
         self._figure, axes = plt.subplots()
         axes.set_aspect("equal")
 
-        for name, _ in self._infos.items():
-            self._plot_grid(axes, name)
+        for i, name in enumerate(self._infos):
+            self._plot_grid(axes, name, self._colors[i % len(self._colors)])
 
         self._figure.show()
         self._figure.tight_layout()
@@ -100,13 +93,11 @@ class GridSpecPlot(fm.Component):
     def _finalize(self):
         pass
 
-    def _plot_grid(self, axes, name):
+    def _plot_grid(self, axes, name, color):
         info = self._infos[name]
         data_points = info.grid.data_points
         points = info.grid.points
         cells = info.grid.cells
-
-        color = self._colors[name]
 
         axes_names = {name: i for i, name in enumerate(info.grid.axes_names)}
         axes_indices = [

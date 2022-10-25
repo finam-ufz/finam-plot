@@ -28,11 +28,13 @@ class SchedulePlot(fm.Component):
     ----------
     inputs : list of str
         Input names.
+    colors : list of str, optional
+        List of colors for the inputs. Uses matplotlib default colors by default.
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.plot`.
     """
 
-    def __init__(self, inputs, **plot_kwargs):
+    def __init__(self, inputs, colors=None, **plot_kwargs):
         super().__init__()
         self._time = None
         self._caller = None
@@ -42,6 +44,7 @@ class SchedulePlot(fm.Component):
         self._x = [[] for _ in inputs]
 
         self._input_names = inputs
+        self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
         self._plot_kwargs = plot_kwargs
         if "marker" not in self._plot_kwargs:
@@ -114,7 +117,13 @@ class SchedulePlot(fm.Component):
         """Update the plot."""
         if self._lines is None:
             self._lines = [
-                self._axes.plot([datetime.min], i, label=h, **self._plot_kwargs)[0]
+                self._axes.plot(
+                    [datetime.min],
+                    i,
+                    label=h,
+                    c=self._colors[i % len(self._colors)],
+                    **self._plot_kwargs,
+                )[0]
                 for i, h in enumerate(self._input_names)
             ]
 
