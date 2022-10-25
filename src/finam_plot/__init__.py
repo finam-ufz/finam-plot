@@ -6,27 +6,36 @@ FINAM components for plotting spatial and temporal data.
 
    self
 
-Components
-==========
+Grid and mesh plots
+===================
 
 .. autosummary::
    :toctree: generated
-   :caption: Components
+   :caption: Grid and mesh plots
 
     ColorMeshPlot
     ContourPlot
     GridSpecPlot
     ImagePlot
 
+Point and line plots
+====================
+
 .. autosummary::
    :toctree: generated
-   :caption: Adapters
+   :caption: Point and line plots
+
+    SchedulePlot
+    StepTimeSeriesPlot
+    TimeSeriesPlot
 
 """
 from .colormesh import ColorMeshPlot
 from .contour import ContourPlot
 from .grid_spec import GridSpecPlot
 from .image import ImagePlot
+from .schedule import SchedulePlot
+from .time_series import StepTimeSeriesPlot, TimeSeriesPlot
 
 try:
     from ._version import __version__
@@ -39,4 +48,7 @@ __all__ = [
     "ContourPlot",
     "GridSpecPlot",
     "ImagePlot",
+    "SchedulePlot",
+    "StepTimeSeriesPlot",
+    "TimeSeriesPlot",
 ]
