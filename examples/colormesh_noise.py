@@ -28,6 +28,6 @@ if __name__ == "__main__":
     comp.initialize()
 
     source.outputs["Noise"] >> trigger.inputs["In"]
-    trigger.outputs["Out"] >> plot.inputs["Image"]
+    trigger.outputs["Out"] >> plot.inputs["Grid"]
 
     comp.run(datetime(2001, 1, 1))

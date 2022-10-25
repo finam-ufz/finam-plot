@@ -8,6 +8,17 @@ import matplotlib.pyplot as plt
 class GridSpecPlot(fm.Component):
     """Plots the geometry of grid specifications
 
+    .. code-block:: text
+
+                     +--------------+
+        --> [custom] |              |
+        --> [custom] | GridSpecPlot |
+        --> [......] |              |
+                     +--------------+
+
+    Note:
+        This component is push-based without an internal time step.
+
     Parameters
     ----------
     inputs : list

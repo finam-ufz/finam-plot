@@ -11,6 +11,17 @@ class ImagePlot(fm.Component):
 
     Data must be of grid type :class:`finam.UniformGrid`.
 
+    .. code-block:: text
+
+                   +-------------+
+                   |             |
+        --> [Grid] |  ImagePlot  |
+                   |             |
+                   +-------------+
+
+    Note:
+        This component is push-based without an internal time step.
+
     Parameters
     ----------
     limits : tuple of (float, float), optional
@@ -33,7 +44,7 @@ class ImagePlot(fm.Component):
     def _initialize(self):
         self.inputs.add(
             io=fm.CallbackInput(
-                name="Image",
+                name="Grid",
                 callback=self._data_changed,
                 time=None,
                 grid=None,
@@ -45,7 +56,7 @@ class ImagePlot(fm.Component):
     def _connect(self):
         self.try_connect()
 
-        in_info = self.connector.in_infos["Image"]
+        in_info = self.connector.in_infos["Grid"]
         if in_info is not None:
             self._info = in_info
             with fm.tools.ErrorLogger(self.logger):
@@ -69,7 +80,7 @@ class ImagePlot(fm.Component):
     def _plot(self):
         try:
             data = fm.data.get_magnitude(
-                fm.data.strip_time(self._inputs["Image"].pull_data(self._time))
+                fm.data.strip_time(self._inputs["Grid"].pull_data(self._time))
             )
         except fm.FinamNoDataError as e:
             if self.status in (

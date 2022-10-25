@@ -47,7 +47,7 @@ class TestImage(unittest.TestCase):
         comp = fm.Composition([source, plot])
         comp.initialize()
 
-        source.outputs["Out"] >> plot.inputs["Image"]
+        source.outputs["Out"] >> plot.inputs["Grid"]
 
         comp.run(datetime(2000, 1, 5))
 
