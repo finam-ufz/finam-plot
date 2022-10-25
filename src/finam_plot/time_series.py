@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 class TimeSeriesPlot(fm.Component):
-    """Line plot for multiple time series.
+    """Line plot for multiple time series, push-based.
 
     Expects all inputs to be scalar values.
 
@@ -141,7 +141,7 @@ class TimeSeriesPlot(fm.Component):
 
 
 class StepTimeSeriesPlot(fm.TimeComponent):
-    """Line plot for multiple time series.
+    """Line plot for multiple time series, with internal time step.
 
     Expects all inputs to be scalar values.
 
