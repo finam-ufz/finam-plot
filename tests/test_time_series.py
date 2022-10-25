@@ -66,7 +66,7 @@ class TestPushTimeSeries(unittest.TestCase):
             step=timedelta(days=3),
         )
 
-        series = TimeSeriesPlot(["Gen1", "Gen2"])
+        series = TimeSeriesPlot(["Gen1", "Gen2"], marker="o")
 
         comp = fm.Composition([gen1, gen2, series])
         comp.initialize()

@@ -43,7 +43,7 @@ class TestImage(unittest.TestCase):
             step=timedelta(days=1),
         )
 
-        plot = ImagePlot(axes=(0, 1))
+        plot = ImagePlot(axes=(0, 1), vmin=0, vmax=1)
 
         comp = fm.Composition([source, plot])
         comp.initialize()

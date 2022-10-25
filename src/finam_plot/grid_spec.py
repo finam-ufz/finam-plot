@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 class GridSpecPlot(fm.Component):
     """Plots the geometry of grid specifications
 
+    Uses :func:`matplotlib.pyplot.plot` and :func:`matplotlib.pyplot.scatter`.
+
     .. code-block:: text
 
                      +--------------+
@@ -55,8 +57,6 @@ class GridSpecPlot(fm.Component):
         self._infos = {name: None for name in self._names}
 
         self.drawn = False
-
-        self.status = fm.ComponentStatus.CREATED
 
     def _initialize(self):
         for name in self._names:

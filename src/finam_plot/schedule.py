@@ -11,6 +11,8 @@ class SchedulePlot(fm.Component):
 
     Takes inputs of arbitrary types and simply plots the time of notifications of each input.
 
+    Uses :func:`matplotlib.pyplot.plot`.
+
     .. code-block:: text
 
                      +--------------+
@@ -26,9 +28,11 @@ class SchedulePlot(fm.Component):
     ----------
     inputs : list of str
         Input names.
+    **plot_kwargs
+        Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.plot`.
     """
 
-    def __init__(self, inputs):
+    def __init__(self, inputs, **plot_kwargs):
         super().__init__()
         self._time = None
         self._caller = None
@@ -38,6 +42,10 @@ class SchedulePlot(fm.Component):
         self._x = [[] for _ in inputs]
 
         self._input_names = inputs
+
+        self._plot_kwargs = plot_kwargs
+        if "marker" not in self._plot_kwargs:
+            self._plot_kwargs["marker"] = "+"
 
     def _initialize(self):
         """Initialize the component.
@@ -106,7 +114,7 @@ class SchedulePlot(fm.Component):
         """Update the plot."""
         if self._lines is None:
             self._lines = [
-                self._axes.plot([datetime.min], i, marker="+", label=h)[0]
+                self._axes.plot([datetime.min], i, label=h, **self._plot_kwargs)[0]
                 for i, h in enumerate(self._input_names)
             ]
 

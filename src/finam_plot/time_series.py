@@ -11,6 +11,8 @@ class TimeSeriesPlot(fm.Component):
 
     Expects all inputs to be scalar values.
 
+    Uses :func:`matplotlib.pyplot.plot`.
+
     .. code-block:: text
 
                      +----------------+
@@ -26,9 +28,11 @@ class TimeSeriesPlot(fm.Component):
     ----------
     inputs : list of str
         List of input names (plot series) that will become available for coupling.
+    **plot_kwargs
+        Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.plot`.
     """
 
-    def __init__(self, inputs):
+    def __init__(self, inputs, **plot_kwargs):
         super().__init__()
         self._time = None
         self._caller = None
@@ -40,6 +44,7 @@ class TimeSeriesPlot(fm.Component):
         self._lines = None
 
         self._input_names = inputs
+        self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
         """Initialize the component.
@@ -110,7 +115,8 @@ class TimeSeriesPlot(fm.Component):
     def _update_plot(self):
         if self._lines is None:
             self._lines = [
-                self._axes.plot([], [], label=h)[0] for h in self._input_names
+                self._axes.plot([], [], label=h, **self._plot_kwargs)[0]
+                for h in self._input_names
             ]
             self._axes.legend(loc=1)
 
@@ -148,6 +154,8 @@ class StepTimeSeriesPlot(fm.TimeComponent):
     This component has an internal time step.
     For a push-based line series plot, see :class:`.TimeSeriesPlot`.
 
+    Uses :func:`matplotlib.pyplot.plot`.
+
     .. code-block:: text
 
                      +----------------+
@@ -169,9 +177,13 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         Values are numbers of updates, i.e. whole-numbered factors for ``step``.
     update_interval : int, optional
          Redraw interval (independent of data retrieval).
+    **plot_kwargs
+        Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.plot`.
     """
 
-    def __init__(self, inputs, start, step, intervals=None, update_interval=1):
+    def __init__(
+        self, inputs, start, step, intervals=None, update_interval=1, **plot_kwargs
+    ):
         super().__init__()
         with fm.tools.ErrorLogger(self.logger):
             if not isinstance(start, datetime):
@@ -191,6 +203,7 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         self._lines = None
 
         self._input_names = inputs
+        self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
         """Initialize the component.
@@ -235,7 +248,8 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         """
         if self._lines is None:
             self._lines = [
-                self._axes.plot([], [], label=h)[0] for h in self._input_names
+                self._axes.plot([], [], label=h, **self._plot_kwargs)[0]
+                for h in self._input_names
             ]
             self._axes.legend(loc=1)
 

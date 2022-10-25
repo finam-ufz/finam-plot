@@ -11,6 +11,8 @@ class ImagePlot(fm.Component):
 
     Data must be of grid type :class:`finam.UniformGrid`.
 
+    Uses :func:`matplotlib.pyplot.imshow`.
+
     .. code-block:: text
 
                    +-------------+
@@ -24,13 +26,13 @@ class ImagePlot(fm.Component):
 
     Parameters
     ----------
-    limits : tuple of (float, float), optional
-        Limits of the colormap limits. Default dynamic.
     axes : (int, int) or (str, str)
         Tuple of axes indices or names.
+    **plot_kwargs
+        Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.imshow`.
     """
 
-    def __init__(self, limits=(None, None), axes=(0, 1)):
+    def __init__(self, axes=(0, 1), **plot_kwargs):
         super().__init__()
         self._time = None
         self._figure = None
@@ -38,8 +40,7 @@ class ImagePlot(fm.Component):
         self._axes = axes
         self._info = None
         self._image = None
-        self.vmin = limits[0]
-        self.vmax = limits[1]
+        self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
         self.inputs.add(
@@ -129,7 +130,7 @@ class ImagePlot(fm.Component):
 
         if self._image is None:
             self._image = self._plot_ax.imshow(
-                data, interpolation=None, vmin=self.vmin, vmax=self.vmax, origin="lower"
+                data, interpolation=None, origin="lower", **self._plot_kwargs
             )
         else:
             self._image.set_data(data)
