@@ -12,6 +12,8 @@ class ColorMeshPlot(fm.Component):
     Data must be of grid type :class:`finam.RectilinearGrid`, :class:`finam.UniformGrid`
     or :class:`finam.EsriGrid`.
 
+    Uses :func:`matplotlib.pyplot.pcolormesh`.
+
     .. code-block:: text
 
                    +---------------+
@@ -25,13 +27,13 @@ class ColorMeshPlot(fm.Component):
 
     Parameters
     ----------
-    limits : tuple of (float, float), optional
-        Limits of the colormap limits. Default dynamic.
     axes : (int, int) or (str, str)
         Tuple of axes indices or names.
+    **plot_kwargs
+        Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.pcolormesh`.
     """
 
-    def __init__(self, limits=(None, None), axes=(0, 1)):
+    def __init__(self, axes=(0, 1), **plot_kwargs):
         super().__init__()
         self._time = None
         self._figure = None
@@ -39,8 +41,7 @@ class ColorMeshPlot(fm.Component):
         self._axes = axes
         self._info = None
         self._mesh = None
-        self.vmin = limits[0]
-        self.vmax = limits[1]
+        self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
         self.inputs.add(
@@ -134,7 +135,10 @@ class ColorMeshPlot(fm.Component):
 
         if self._mesh is None:
             self._mesh = self._plot_ax.pcolormesh(
-                data_axes[0], data_axes[1], data, vmin=self.vmin, vmax=self.vmax
+                data_axes[0],
+                data_axes[1],
+                data,
+                **self._plot_kwargs,
             )
         else:
             self._mesh.set_array(data.ravel())

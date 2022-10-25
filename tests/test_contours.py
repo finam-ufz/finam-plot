@@ -35,7 +35,7 @@ class TestContour(unittest.TestCase):
             step=timedelta(days=1),
         )
 
-        plot = ContourPlot(triangulate=True)
+        plot = ContourPlot(triangulate=True, cmap="hsv")
 
         comp = fm.Composition([source, plot])
         comp.initialize()

@@ -12,6 +12,18 @@ class ContourPlot(fm.Component):
 
     Data must be of grid and FINAM grid type.
 
+    Used plot function depends on grid type and fill argument:
+
+    * Structured grids: :func:`matplotlib.pyplot.contour` and :func:`matplotlib.pyplot.contourf`
+    * Point data and unstructured grids with point-associated data:
+      :func:`matplotlib.pyplot.tricontour` and :func:`matplotlib.pyplot.tricontourf`
+    * Unstructured cell data:
+
+      * Filled: :func:`matplotlib.pyplot.tripcolor`
+      * Not filled: :func:`matplotlib.pyplot.tricontour`
+
+    Unstructured cell data with quads is currently not supported with ``fill=True``.
+
     .. code-block:: text
 
                    +-------------+
@@ -25,17 +37,23 @@ class ContourPlot(fm.Component):
 
     Parameters
     ----------
-    limits : tuple of (float, float), optional
-        Limits of the colormap limits. Default dynamic.
     axes : (int, int) or (str, str)
         Tuple of axes indices or names.
     fill : bool
         Whether to draw filled contours.
     triangulate : bool
         Allow/force triangulation.
+    **plot_kwargs
+        Keyword arguments passed to plot function. See the list of functions above.
     """
 
-    def __init__(self, limits=(None, None), axes=(0, 1), fill=True, triangulate=False):
+    def __init__(
+        self,
+        axes=(0, 1),
+        fill=True,
+        triangulate=False,
+        **plot_kwargs,
+    ):
         super().__init__()
         self._time = None
         self._figure = None
@@ -46,8 +64,7 @@ class ContourPlot(fm.Component):
         self._info = None
         self._contours = None
         self.triangulation = None
-        self.vmin = limits[0]
-        self.vmax = limits[1]
+        self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
         self.inputs.add(
@@ -132,11 +149,11 @@ class ContourPlot(fm.Component):
 
         if self._fill:
             self._contours = self._plot_ax.contourf(
-                *data_axes, data, vmin=self.vmin, vmax=self.vmax
+                *data_axes, data, **self._plot_kwargs
             )
         else:
             self._contours = self._plot_ax.contour(
-                *data_axes, data, vmin=self.vmin, vmax=self.vmax
+                *data_axes, data, **self._plot_kwargs
             )
 
     def _plot_unstructured(self, data, axes):
@@ -167,11 +184,11 @@ class ContourPlot(fm.Component):
             )
             if self._fill:
                 self._contours = self._plot_ax.tricontourf(
-                    *self.triangulation, data_flat, vmin=self.vmin, vmax=self.vmax
+                    *self.triangulation, data_flat, **self._plot_kwargs
                 )
             else:
                 self._contours = self._plot_ax.tricontour(
-                    *self.triangulation, data_flat, vmin=self.vmin, vmax=self.vmax
+                    *self.triangulation, data_flat, **self._plot_kwargs
                 )
         else:
             if self._fill:
@@ -193,8 +210,7 @@ class ContourPlot(fm.Component):
                     *self._info.grid.points.T[list(axes)],
                     data_flat,
                     triangles=self._info.grid.cells,
-                    vmin=self.vmin,
-                    vmax=self.vmax,
+                    **self._plot_kwargs,
                 )
             else:
                 if self.triangulation is None:
@@ -206,7 +222,7 @@ class ContourPlot(fm.Component):
                     data.reshape(-1, order=self._info.grid.order)
                 )
                 self._contours = self._plot_ax.tricontour(
-                    *self.triangulation, data_flat, vmin=self.vmin, vmax=self.vmax
+                    *self.triangulation, data_flat, **self._plot_kwargs
                 )
 
     def _data_changed(self, _caller, time):
