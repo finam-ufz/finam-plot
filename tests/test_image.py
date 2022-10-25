@@ -3,9 +3,10 @@ from datetime import datetime, timedelta
 
 import finam as fm
 import numpy as np
-from finam.modules.generators import CallbackGenerator
+from finam.modules import CallbackGenerator
+from matplotlib import pyplot
 
-from finam_plot.image import ImagePlot
+from finam_plot import ImagePlot
 
 
 class TestImage(unittest.TestCase):
@@ -52,3 +53,5 @@ class TestImage(unittest.TestCase):
         comp.run(datetime(2000, 1, 5))
 
         self.assertEqual(plot._info, info_1)
+
+        pyplot.close("all")
