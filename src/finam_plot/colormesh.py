@@ -1,4 +1,4 @@
-"""Raster image plot component for uniform grids."""
+"""Raster image plot component for uniform and rectilinear grids."""
 from datetime import datetime
 
 import finam as fm
@@ -6,10 +6,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-class ImagePlot(fm.Component):
-    """Raster image plot component for uniform grids.
+class ColorMeshPlot(fm.Component):
+    """Raster image plot component for uniform and rectilinear grids.
 
-    Data must be of grid type :class:`finam.UniformGrid`.
+    Data must be of grid type :class:`finam.RectilinearGrid`, :class:`finam.UniformGrid`
+    or :class:`finam.EsriGrid`.
 
     Parameters
     ----------
@@ -26,7 +27,7 @@ class ImagePlot(fm.Component):
         self._plot_ax = None
         self._axes = axes
         self._info = None
-        self._image = None
+        self._mesh = None
         self.vmin = limits[0]
         self.vmax = limits[1]
 
@@ -49,13 +50,13 @@ class ImagePlot(fm.Component):
         if in_info is not None:
             self._info = in_info
             with fm.tools.ErrorLogger(self.logger):
-                if isinstance(self._info.grid, fm.UniformGrid):
+                if isinstance(self._info.grid, fm.RectilinearGrid):
                     if self._info.grid.dim != 2:
                         raise ValueError(
-                            "Only 2-D UniformGrid is supported in image plot."
+                            "Only 2-D RectilinearGrid is supported in image plot."
                         )
                 else:
-                    raise ValueError("Only UniformGrid is supported in image plot.")
+                    raise ValueError("Only RectilinearGrid is supported in image plot.")
 
     def _validate(self):
         pass
@@ -116,12 +117,14 @@ class ImagePlot(fm.Component):
         if not self._info.grid.axes_increase[axes[1]]:
             data = np.flip(data, axis=axes[1])
 
-        if self._image is None:
-            self._image = self._plot_ax.imshow(
-                data, interpolation=None, vmin=self.vmin, vmax=self.vmax, origin="lower"
+        data_axes = [self._info.grid.axes[i] for i in axes]
+
+        if self._mesh is None:
+            self._mesh = self._plot_ax.pcolormesh(
+                data_axes[0], data_axes[1], data, vmin=self.vmin, vmax=self.vmax
             )
         else:
-            self._image.set_data(data)
+            self._mesh.set_array(data.ravel())
 
     def _data_changed(self, _caller, time):
         if not isinstance(time, datetime):

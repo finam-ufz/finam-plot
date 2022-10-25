@@ -1,13 +1,22 @@
 """Components for plotting grid specifications"""
 import math
 
+import finam as fm
 import matplotlib.pyplot as plt
-from finam import CallbackInput, Component, ComponentStatus, UnstructuredPoints
-from finam.data.grid_tools import StructuredGrid
 
 
-class GridSpecPlot(Component):
-    """Plots the geometry of grid specifications"""
+class GridSpecPlot(fm.Component):
+    """Plots the geometry of grid specifications
+
+    Parameters
+    ----------
+    inputs : list
+        List on input names.
+    axes : (int, int) or (str, str), optional
+        Tuple of axes indices or names. Default (0, 1).
+    colors : list od str or str, optional
+        Colors to use for the inputs, or a single color. Default "black".
+    """
 
     def __init__(self, inputs, axes=(0, 1), colors="black"):
         super().__init__()
@@ -36,12 +45,12 @@ class GridSpecPlot(Component):
 
         self.drawn = False
 
-        self.status = ComponentStatus.CREATED
+        self.status = fm.ComponentStatus.CREATED
 
     def _initialize(self):
         for name in self._names:
             self.inputs.add(
-                io=CallbackInput(
+                io=fm.CallbackInput(
                     name=name,
                     callback=self._data_changed,
                     time=None,
@@ -61,7 +70,7 @@ class GridSpecPlot(Component):
         pass
 
     def _update(self):
-        if self.drawn or self.status != ComponentStatus.VALIDATED:
+        if self.drawn or self.status != fm.ComponentStatus.VALIDATED:
             return
 
         self.drawn = True
@@ -97,12 +106,12 @@ class GridSpecPlot(Component):
         ax_1 = axes_indices[0]
         ax_2 = axes_indices[1]
 
-        if not isinstance(info.grid, UnstructuredPoints):
+        if not isinstance(info.grid, fm.UnstructuredPoints):
             self._plot_cells(axes, points, cells, axes_indices, color)
 
         axes.scatter(*data_points.T[[ax_1, ax_2]], marker="+", c=color)
 
-        if not isinstance(info.grid, StructuredGrid):
+        if not isinstance(info.grid, fm.data.StructuredGrid):
             return
 
         axes_inc = info.grid.axes_increase[[ax_1, ax_2]]
