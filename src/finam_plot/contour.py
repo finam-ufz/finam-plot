@@ -8,9 +8,23 @@ from matplotlib.tri import Triangulation
 
 
 class ContourPlot(fm.Component):
-    """Plots contours"""
+    """Contour plot component for structured and unstructured grids
 
-    def __init__(self, axes=(0, 1), limits=(None, None), fill=True, triangulate=False):
+    Data must be of grid and FINAM grid type.
+
+    Parameters
+    ----------
+    limits : tuple of (float, float), optional
+        Limits of the colormap limits. Default dynamic.
+    axes : (int, int) or (str, str)
+        Tuple of axes indices or names.
+    fill : bool
+        Whether to draw filled contours.
+    triangulate : bool
+        Allow/force triangulation.
+    """
+
+    def __init__(self, limits=(None, None), axes=(0, 1), fill=True, triangulate=False):
         super().__init__()
         self._time = None
         self._figure = None

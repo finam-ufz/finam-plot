@@ -6,7 +6,17 @@ import matplotlib.pyplot as plt
 
 
 class GridSpecPlot(fm.Component):
-    """Plots the geometry of grid specifications"""
+    """Plots the geometry of grid specifications
+
+    Parameters
+    ----------
+    inputs : list
+        List on input names.
+    axes : (int, int) or (str, str), optional
+        Tuple of axes indices or names. Default (0, 1).
+    colors : list od str or str, optional
+        Colors to use for the inputs, or a single color. Default "black".
+    """
 
     def __init__(self, inputs, axes=(0, 1), colors="black"):
         super().__init__()

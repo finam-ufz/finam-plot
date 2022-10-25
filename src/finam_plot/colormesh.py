@@ -7,7 +7,18 @@ import numpy as np
 
 
 class ColorMeshPlot(fm.Component):
-    """Raster image plot component for uniform and rectilinear grids."""
+    """Raster image plot component for uniform and rectilinear grids.
+
+    Data must be of grid type :class:`finam.RectilinearGrid`, :class:`finam.UniformGrid`
+    or :class:`finam.EsriGrid`.
+
+    Parameters
+    ----------
+    limits : tuple of (float, float), optional
+        Limits of the colormap limits. Default dynamic.
+    axes : (int, int) or (str, str)
+        Tuple of axes indices or names.
+    """
 
     def __init__(self, limits=(None, None), axes=(0, 1)):
         super().__init__()
