@@ -28,6 +28,12 @@ from .contour import ContourPlot
 from .grid_spec import GridSpecPlot
 from .image import ImagePlot
 
+try:
+    from ._version import __version__
+except ModuleNotFoundError:  # pragma: no cover
+    # package is not installed
+    __version__ = "0.0.0.dev0"
+
 __all__ = [
     "ColorMeshPlot",
     "ContourPlot",
