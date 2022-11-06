@@ -54,8 +54,6 @@ class SchedulePlot(fm.Component):
 
     def __init__(self, inputs, colors=None, **plot_kwargs):
         super().__init__()
-        self._time = None
-        self._caller = None
         self._figure = None
         self._axes = None
         self._lines = None
@@ -104,7 +102,6 @@ class SchedulePlot(fm.Component):
 
         After the method call, the component should have status VALIDATED.
         """
-        self._update_plot()
 
     def _data_changed(self, caller, time):
         """Update for changed data.
@@ -116,22 +113,15 @@ class SchedulePlot(fm.Component):
         time : datetime
             simulation time to get the data for.
         """
-        self._caller = caller
-        self._time = time
-
-        if self.status in (fm.ComponentStatus.UPDATED, fm.ComponentStatus.VALIDATED):
-            self.update()
-        else:
-            self._update_plot()
+        self._update_plot(caller, time)
 
     def _update(self):
         """Update the component by one time step and push new values to outputs.
 
         After the method call, the component should have status UPDATED or FINISHED.
         """
-        self._update_plot()
 
-    def _update_plot(self):
+    def _update_plot(self, caller, time):
         """Update the plot."""
         if self._lines is None:
             self._lines = [
@@ -146,8 +136,8 @@ class SchedulePlot(fm.Component):
             ]
 
         for i, inp in enumerate(self._input_names):
-            if self.inputs[inp] == self._caller:
-                self._x[i].append(self._time)
+            if self.inputs[inp] == caller:
+                self._x[i].append(time)
 
         for i, line in enumerate(self._lines):
             line.set_xdata(self._x[i])

@@ -265,6 +265,7 @@ class StepTimeSeriesPlot(fm.TimeComponent):
 
     @property
     def next_time(self):
+        """The component's predicted simulation time of the next pulls."""
         return self.time + self._step
 
     def _initialize(self):
