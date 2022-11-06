@@ -263,6 +263,10 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         self._plot_kwargs = plot_kwargs
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
+    @property
+    def next_time(self):
+        return self.time + self._step
+
     def _initialize(self):
         """Initialize the component.
 
@@ -304,6 +308,8 @@ class StepTimeSeriesPlot(fm.TimeComponent):
 
         After the method call, the component should have status UPDATED or FINISHED.
         """
+        self._time += self._step
+
         if self._lines is None:
             self._lines = [
                 self._axes.plot(
@@ -337,7 +343,6 @@ class StepTimeSeriesPlot(fm.TimeComponent):
             self._figure.canvas.draw()
             self._figure.canvas.flush_events()
 
-        self._time += self._step
         self._updates += 1
 
     def _finalize(self):
