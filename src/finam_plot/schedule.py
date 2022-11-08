@@ -46,13 +46,15 @@ class SchedulePlot(fm.Component):
     ----------
     inputs : list of str
         Input names.
+    title : str, optional
+        Title for plot and window.
     colors : list of str, optional
         List of colors for the inputs. Uses matplotlib default colors by default.
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.plot`.
     """
 
-    def __init__(self, inputs, colors=None, **plot_kwargs):
+    def __init__(self, inputs, title=None, colors=None, **plot_kwargs):
         super().__init__()
         self._figure = None
         self._axes = None
@@ -60,6 +62,7 @@ class SchedulePlot(fm.Component):
         self._x = [[] for _ in inputs]
 
         self._input_names = inputs
+        self._title = title
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
         self._plot_kwargs = plot_kwargs
@@ -78,6 +81,9 @@ class SchedulePlot(fm.Component):
             )
 
         self._figure, self._axes = plt.subplots(figsize=(8, 3))
+
+        self._figure.canvas.manager.set_window_title(self._title)
+        self._axes.set_title(self._title)
 
         date_format = mdates.AutoDateFormatter(self._axes.xaxis)
         self._axes.xaxis.set_major_formatter(date_format)

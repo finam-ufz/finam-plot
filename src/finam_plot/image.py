@@ -43,13 +43,15 @@ class ImagePlot(fm.Component):
 
     Parameters
     ----------
+    title : str, optional
+        Title for plot and window.
     axes : (int, int) or (str, str), optional
         Tuple of axes indices or names. Default (0, 1).
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.imshow`.
     """
 
-    def __init__(self, axes=(0, 1), **plot_kwargs):
+    def __init__(self, title=None, axes=(0, 1), **plot_kwargs):
         super().__init__()
         self._time = None
         self._figure = None
@@ -58,6 +60,7 @@ class ImagePlot(fm.Component):
         self._info = None
         self._image = None
         self._extent = None
+        self._title = title
         self._time_text = None
         self._plot_kwargs = plot_kwargs
 
@@ -123,6 +126,9 @@ class ImagePlot(fm.Component):
         if self._figure is None:
             self._figure, self._plot_ax = plt.subplots()
             self._plot_ax.set_aspect("equal")
+
+            self._figure.canvas.manager.set_window_title(self._title)
+            self._plot_ax.set_title(self._title)
 
             g = self._info.grid
             self._extent = []

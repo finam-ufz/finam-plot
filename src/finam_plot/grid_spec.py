@@ -43,16 +43,19 @@ class GridSpecPlot(fm.Component):
     ----------
     inputs : list
         List on input names.
+    title : str, optional
+        Title for plot and window.
     axes : (int, int) or (str, str), optional
         Tuple of axes indices or names. Default (0, 1).
     colors : list of str, optional
         List of colors for the inputs. Uses matplotlib default colors by default.
     """
 
-    def __init__(self, inputs, axes=(0, 1), colors=None):
+    def __init__(self, inputs, title=None, axes=(0, 1), colors=None):
         super().__init__()
         self._figure = None
         self._names = inputs
+        self._title = title
 
         if isinstance(axes, list):
             if len(axes) != len(self._names):
@@ -95,6 +98,9 @@ class GridSpecPlot(fm.Component):
     def _update_plot(self):
         self._figure, axes = plt.subplots()
         axes.set_aspect("equal")
+
+        self._figure.canvas.manager.set_window_title(self._title)
+        axes.set_title(self._title)
 
         for i, name in enumerate(self._infos):
             self._plot_grid(axes, name, self._colors[i % len(self._colors)])

@@ -56,6 +56,8 @@ class ContourPlot(fm.Component):
 
     Parameters
     ----------
+    title : str, optional
+        Title for plot and window.
     axes : (int, int) or (str, str), optional
         Tuple of axes indices or names. Default (0, 1).
     fill : bool, optional
@@ -68,6 +70,7 @@ class ContourPlot(fm.Component):
 
     def __init__(
         self,
+        title=None,
         axes=(0, 1),
         fill=True,
         triangulate=False,
@@ -84,6 +87,7 @@ class ContourPlot(fm.Component):
         self._contours = None
         self._time_text = None
         self.triangulation = None
+        self._title = title
         self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
@@ -133,11 +137,15 @@ class ContourPlot(fm.Component):
             self._figure, self._plot_ax = plt.subplots()
             self._plot_ax.set_aspect("equal")
             self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
+
+            self._figure.canvas.manager.set_window_title(self._title)
+            self._plot_ax.set_title(self._title)
         else:
             self._time_text.set_text(self._time)
 
         if self._contours is not None:
             self._plot_ax.clear()
+            self._plot_ax.set_title(self._title)
 
         axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
         axes_indices = [

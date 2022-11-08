@@ -19,11 +19,13 @@ if __name__ == "__main__":
         octaves=3,
         persistence=0.5,
     )
-    plot_orig = ImagePlot(vmin=-1, vmax=1, cmap="hsv")
-    plot_unif = ImagePlot(vmin=-1, vmax=1, cmap="hsv")
-    plot_points = ContourPlot(triangulate=True, vmin=-1, vmax=1, cmap="hsv")
+    plot_orig = ImagePlot(title="Original", vmin=-1, vmax=1, cmap="hsv")
+    plot_unif = ImagePlot(title="UniformGrid", vmin=-1, vmax=1, cmap="hsv")
+    plot_points = ContourPlot(
+        title="UnstructuredPoints", triangulate=True, vmin=-1, vmax=1, cmap="hsv"
+    )
 
-    specs = GridSpecPlot(["Unif", "Orig", "Points"])
+    specs = GridSpecPlot(["Unif", "Orig", "Points"], title="Grid specifications")
 
     regrid_unif = fm.adapters.RegridLinear(
         out_grid=uniform_grid, fill_with_nearest=True
