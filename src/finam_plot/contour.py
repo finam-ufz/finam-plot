@@ -82,6 +82,7 @@ class ContourPlot(fm.Component):
         self._fill = fill
         self._info = None
         self._contours = None
+        self._time_text = None
         self.triangulation = None
         self._plot_kwargs = plot_kwargs
 
@@ -131,6 +132,9 @@ class ContourPlot(fm.Component):
         if self._figure is None:
             self._figure, self._plot_ax = plt.subplots()
             self._plot_ax.set_aspect("equal")
+            self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
+        else:
+            self._time_text.set_text(self._time)
 
         if self._contours is not None:
             self._plot_ax.clear()

@@ -58,6 +58,7 @@ class ImagePlot(fm.Component):
         self._info = None
         self._image = None
         self._extent = None
+        self._time_text = None
         self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
@@ -174,8 +175,10 @@ class ImagePlot(fm.Component):
                 extent=self._extent,
                 **self._plot_kwargs,
             )
+            self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
         else:
             self._image.set_data(data)
+            self._time_text.set_text(self._time)
 
     def _data_changed(self, _caller, time):
         if time is not None and not isinstance(time, datetime):

@@ -58,6 +58,7 @@ class ColorMeshPlot(fm.Component):
         self._axes = axes
         self._info = None
         self._mesh = None
+        self._time_text = None
         self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
@@ -157,8 +158,10 @@ class ColorMeshPlot(fm.Component):
                 data,
                 **self._plot_kwargs,
             )
+            self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
         else:
             self._mesh.set_array(data.ravel())
+            self._time_text.set_text(self._time)
 
     def _data_changed(self, _caller, time):
         if time is not None and not isinstance(time, datetime):
