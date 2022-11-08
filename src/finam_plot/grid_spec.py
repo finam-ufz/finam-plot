@@ -67,8 +67,6 @@ class GridSpecPlot(fm.Component):
 
         self._infos = {name: None for name in self._names}
 
-        self.drawn = False
-
     def _initialize(self):
         for name in self._names:
             self.inputs.add(
@@ -89,14 +87,12 @@ class GridSpecPlot(fm.Component):
                 self._infos[name] = val
 
     def _validate(self):
-        pass
+        self._update_plot()
 
     def _update(self):
-        if self.drawn or self.status != fm.ComponentStatus.VALIDATED:
-            return
+        pass
 
-        self.drawn = True
-
+    def _update_plot(self):
         self._figure, axes = plt.subplots()
         axes.set_aspect("equal")
 
@@ -182,4 +178,5 @@ class GridSpecPlot(fm.Component):
                 )
 
     def _data_changed(self, _caller, _time):
-        self.update()
+        pass
+        # self.update()
