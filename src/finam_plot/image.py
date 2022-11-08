@@ -153,7 +153,7 @@ class ImagePlot(fm.Component):
             self._image.set_data(data)
 
     def _data_changed(self, _caller, time):
-        if not isinstance(time, datetime):
+        if time is not None and not isinstance(time, datetime):
             with fm.tools.ErrorLogger(self.logger):
                 raise ValueError("Time must be of type datetime")
 
