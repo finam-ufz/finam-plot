@@ -21,7 +21,7 @@ if __name__ == "__main__":
         step=timedelta(days=1),
         in_info=fm.Info(time=None, grid=None, units=None),
     )
-    plot = ContourPlot(triangulate=True, vmin=-1, vmax=1)
+    plot = ContourPlot(title="Simplex noise", triangulate=True, vmin=-1, vmax=1)
 
     comp = fm.Composition([source, trigger, plot])
     comp.initialize()

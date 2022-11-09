@@ -44,13 +44,15 @@ class ColorMeshPlot(fm.Component):
 
     Parameters
     ----------
+    title : str, optional
+        Title for plot and window.
     axes : (int, int) or (str, str), optional
         Tuple of axes indices or names. Default (0, 1).
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.pcolormesh`.
     """
 
-    def __init__(self, axes=(0, 1), **plot_kwargs):
+    def __init__(self, title=None, axes=(0, 1), **plot_kwargs):
         super().__init__()
         self._time = None
         self._figure = None
@@ -58,6 +60,8 @@ class ColorMeshPlot(fm.Component):
         self._axes = axes
         self._info = None
         self._mesh = None
+        self._time_text = None
+        self._title = title
         self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
@@ -117,6 +121,9 @@ class ColorMeshPlot(fm.Component):
             self._figure, self._plot_ax = plt.subplots()
             self._plot_ax.set_aspect("equal")
 
+            self._figure.canvas.manager.set_window_title(self._title)
+            self._plot_ax.set_title(self._title)
+
         axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
         axes_indices = [
             ax if isinstance(ax, int) else axes_names[ax] for ax in list(self._axes)
@@ -157,11 +164,13 @@ class ColorMeshPlot(fm.Component):
                 data,
                 **self._plot_kwargs,
             )
+            self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
         else:
             self._mesh.set_array(data.ravel())
+            self._time_text.set_text(self._time)
 
     def _data_changed(self, _caller, time):
-        if not isinstance(time, datetime):
+        if time is not None and not isinstance(time, datetime):
             with fm.tools.ErrorLogger(self.logger):
                 raise ValueError("Time must be of type datetime")
 

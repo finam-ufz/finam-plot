@@ -39,7 +39,9 @@ if __name__ == "__main__":
         step=timedelta(days=1),
     )
 
-    plot = GridSpecPlot(["In1", "In2"], axes=("x", "y"), colors=["black", "red"])
+    plot = GridSpecPlot(
+        ["In1", "In2"], title="Grids", axes=("x", "y"), colors=["black", "red"]
+    )
 
     comp = fm.Composition([source, plot])
     comp.initialize()

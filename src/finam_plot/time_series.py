@@ -46,13 +46,15 @@ class TimeSeriesPlot(fm.Component):
     ----------
     inputs : list of str
         List of input names (plot series) that will become available for coupling.
+    title : str, optional
+        Title for plot and window.
     colors : list of str, optional
         List of colors for the inputs. Uses matplotlib default colors by default.
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.plot`.
     """
 
-    def __init__(self, inputs, colors=None, **plot_kwargs):
+    def __init__(self, inputs, title=None, colors=None, **plot_kwargs):
         super().__init__()
         self._time = None
         self._caller = None
@@ -64,6 +66,7 @@ class TimeSeriesPlot(fm.Component):
         self._lines = None
 
         self._input_names = inputs
+        self._title = title
         self._plot_kwargs = plot_kwargs
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
@@ -220,6 +223,8 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         Starting time.
     step : timedelta
         Time step.
+    title : str, optional
+        Title for plot and window.
     colors : list of str, optional
         List of colors for the inputs. Uses matplotlib default colors by default.
     intervals : list of int or None, optional
@@ -236,6 +241,7 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         inputs,
         start,
         step,
+        title=None,
         colors=None,
         intervals=None,
         update_interval=1,
@@ -260,6 +266,7 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         self._lines = None
 
         self._input_names = inputs
+        self._title = title
         self._plot_kwargs = plot_kwargs
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
@@ -278,6 +285,10 @@ class StepTimeSeriesPlot(fm.TimeComponent):
             self.inputs.add(name=inp)
 
         self._figure, self._axes = plt.subplots()
+
+        self._figure.canvas.manager.set_window_title(self._title)
+        self._axes.set_title(self._title)
+
         date_format = mdates.AutoDateFormatter(self._axes.xaxis)
         self._axes.xaxis.set_major_formatter(date_format)
         self._axes.tick_params(axis="x", labelrotation=20)

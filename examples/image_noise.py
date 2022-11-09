@@ -20,7 +20,7 @@ if __name__ == "__main__":
         step=timedelta(days=1),
         in_info=fm.Info(time=None, grid=None, units=None),
     )
-    plot = ImagePlot(vmin=-1, vmax=1, cmap="hsv")
+    plot = ImagePlot(title="Simplex noise", vmin=-1, vmax=1, cmap="hsv")
 
     comp = fm.Composition([source, trigger, plot])
     comp.initialize()

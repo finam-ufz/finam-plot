@@ -43,13 +43,15 @@ class ImagePlot(fm.Component):
 
     Parameters
     ----------
+    title : str, optional
+        Title for plot and window.
     axes : (int, int) or (str, str), optional
         Tuple of axes indices or names. Default (0, 1).
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.imshow`.
     """
 
-    def __init__(self, axes=(0, 1), **plot_kwargs):
+    def __init__(self, title=None, axes=(0, 1), **plot_kwargs):
         super().__init__()
         self._time = None
         self._figure = None
@@ -57,6 +59,9 @@ class ImagePlot(fm.Component):
         self._axes = axes
         self._info = None
         self._image = None
+        self._extent = None
+        self._title = title
+        self._time_text = None
         self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
@@ -110,10 +115,6 @@ class ImagePlot(fm.Component):
             with fm.tools.ErrorLogger(self.logger):
                 raise e
 
-        if self._figure is None:
-            self._figure, self._plot_ax = plt.subplots()
-            self._plot_ax.set_aspect("equal")
-
         axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
         axes_indices = [
             ax if isinstance(ax, int) else axes_names[ax] for ax in list(self._axes)
@@ -121,6 +122,33 @@ class ImagePlot(fm.Component):
 
         ax_1 = axes_indices[0]
         ax_2 = axes_indices[1]
+
+        if self._figure is None:
+            self._figure, self._plot_ax = plt.subplots()
+            self._plot_ax.set_aspect("equal")
+
+            self._figure.canvas.manager.set_window_title(self._title)
+            self._plot_ax.set_title(self._title)
+
+            g = self._info.grid
+            self._extent = []
+
+            self._extent[0:1] = (
+                [g.axes[ax_1][0], g.axes[ax_1][-1]]
+                if g.data_location == fm.Location.CELLS
+                else [
+                    g.axes[ax_1][0] - g.spacing[ax_1] / 2,
+                    g.axes[ax_1][-1] + g.spacing[ax_1] / 2,
+                ]
+            )
+            self._extent[2:3] = (
+                [g.axes[ax_2][0], g.axes[ax_2][-1]]
+                if g.data_location == fm.Location.CELLS
+                else [
+                    g.axes[ax_2][0] - g.spacing[ax_2] / 2,
+                    g.axes[ax_2][-1] + g.spacing[ax_2] / 2,
+                ]
+            )
 
         self._plot_image(data, (ax_1, ax_2))
 
@@ -147,13 +175,19 @@ class ImagePlot(fm.Component):
 
         if self._image is None:
             self._image = self._plot_ax.imshow(
-                data, interpolation=None, origin="lower", **self._plot_kwargs
+                data,
+                interpolation=None,
+                origin="lower",
+                extent=self._extent,
+                **self._plot_kwargs,
             )
+            self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
         else:
             self._image.set_data(data)
+            self._time_text.set_text(self._time)
 
     def _data_changed(self, _caller, time):
-        if not isinstance(time, datetime):
+        if time is not None and not isinstance(time, datetime):
             with fm.tools.ErrorLogger(self.logger):
                 raise ValueError("Time must be of type datetime")
 
