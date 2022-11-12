@@ -103,7 +103,7 @@ html_theme_options = {
 intersphinx_mapping = {
     "Python": ("https://docs.python.org/", None),
     "NumPy": ("http://docs.scipy.org/doc/numpy/", None),
-    "matplotlib": ("http://matplotlib.org", None),
+    "matplotlib": ("http://matplotlib.org/stable/", None),
     "xarray": ("https://docs.xarray.dev/en/stable/", None),
     "pytest": ("https://docs.pytest.org/en/7.1.x/", None),
     "finam": ("https://finam.pages.ufz.de/finam/", None),
