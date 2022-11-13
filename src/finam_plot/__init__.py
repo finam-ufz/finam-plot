@@ -25,6 +25,7 @@ Point and line plots
    :toctree: generated
    :caption: Point and line plots
 
+    LinePlot
     SchedulePlot
     StepTimeSeriesPlot
     TimeSeriesPlot
@@ -34,6 +35,7 @@ from .colormesh import ColorMeshPlot
 from .contour import ContourPlot
 from .grid_spec import GridSpecPlot
 from .image import ImagePlot
+from .line import LinePlot
 from .schedule import SchedulePlot
 from .time_series import StepTimeSeriesPlot, TimeSeriesPlot
 
@@ -48,6 +50,7 @@ __all__ = [
     "ContourPlot",
     "GridSpecPlot",
     "ImagePlot",
+    "LinePlot",
     "SchedulePlot",
     "StepTimeSeriesPlot",
     "TimeSeriesPlot",

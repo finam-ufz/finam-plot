@@ -1,25 +1,23 @@
-"""Schedule visualization."""
-from datetime import datetime
-
+"""Time series visualization."""
 import finam as fm
-import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
 
-class SchedulePlot(fm.Component):
-    """Live visualization of module update schedule.
+class LinePlot(fm.Component):
+    """Line plot for multiple instant series, push-based.
 
-    Takes inputs of arbitrary types and simply plots the time of notifications of each input.
+    Inputs are expected to be 1-D structured grids.
+    The axis is plotted as x, while the data is plotted as y.
 
     Uses :func:`matplotlib.pyplot.plot`.
 
     .. code-block:: text
 
-                     +--------------+
-        --> [custom] |              |
-        --> [custom] | SchedulePlot |
-        --> [......] |              |
-                     +--------------+
+                     +----------+
+        --> [custom] |          |
+        --> [custom] | LinePlot |
+        --> [......] |          |
+                     +----------+
 
     Note:
         This component is push-based without an internal time step.
@@ -31,8 +29,8 @@ class SchedulePlot(fm.Component):
 
         import finam_plot as fmp
 
-        plot = fmp.SchedulePlot(
-            inputs=["Grid1", "Grid2"],
+        plot = fmp.LinePlot(
+            inputs=["Value1", "Value2"],
             colors=["red", "#ff00ee"],
             marker="o", lw=2.0, # plot kwargs
         )
@@ -45,7 +43,7 @@ class SchedulePlot(fm.Component):
     Parameters
     ----------
     inputs : list of str
-        Input names.
+        List of input names (plot series) that will become available for coupling.
     title : str, optional
         Title for plot and window.
     colors : list of str, optional
@@ -56,18 +54,18 @@ class SchedulePlot(fm.Component):
 
     def __init__(self, inputs, title=None, colors=None, **plot_kwargs):
         super().__init__()
+        self._time = None
+        self._caller = None
+
         self._figure = None
         self._axes = None
         self._lines = None
-        self._x = [[] for _ in inputs]
+        self._infos = None
 
         self._input_names = inputs
         self._title = title
-        self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
-
         self._plot_kwargs = plot_kwargs
-        if "marker" not in self._plot_kwargs:
-            self._plot_kwargs["marker"] = "+"
+        self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
     def _initialize(self):
         """Initialize the component.
@@ -77,19 +75,16 @@ class SchedulePlot(fm.Component):
         """
         for inp in self._input_names:
             self.inputs.add(
-                fm.CallbackInput(self._data_changed, name=inp, time=None, grid=None)
+                fm.CallbackInput(
+                    self._data_changed,
+                    name=inp,
+                    time=None,
+                    grid=None,
+                    units=None,
+                )
             )
 
-        self._figure, self._axes = plt.subplots(figsize=(8, 3))
-
-        self._figure.canvas.manager.set_window_title(self._title)
-        self._axes.set_title(self._title)
-
-        date_format = mdates.AutoDateFormatter(self._axes.xaxis)
-        self._axes.xaxis.set_major_formatter(date_format)
-        self._axes.tick_params(axis="x", labelrotation=20)
-        self._axes.set_yticks(range(len(self._input_names)))
-        self._axes.set_yticklabels(self._input_names)
+        self._figure, self._axes = plt.subplots()
 
         self._figure.tight_layout()
         self._figure.show()
@@ -103,11 +98,15 @@ class SchedulePlot(fm.Component):
         """
         self.try_connect()
 
+        if self.status == fm.ComponentStatus.CONNECTED:
+            self._infos = dict(self.connector.in_infos)
+
     def _validate(self):
         """Validate the correctness of the component's settings and coupling.
 
         After the method call, the component should have status VALIDATED.
         """
+        self._update_plot()
 
     def _data_changed(self, caller, time):
         """Update for changed data.
@@ -116,38 +115,49 @@ class SchedulePlot(fm.Component):
         ----------
         caller
             Caller.
-        time : datetime
+        time : datetime.datetime
             simulation time to get the data for.
         """
-        self._update_plot(caller, time)
+        self._caller = caller
+        self._time = time
+
+        if self.status in (fm.ComponentStatus.UPDATED, fm.ComponentStatus.VALIDATED):
+            self.update()
+        else:
+            self._update_plot()
 
     def _update(self):
         """Update the component by one time step and push new values to outputs.
 
         After the method call, the component should have status UPDATED or FINISHED.
         """
+        self._update_plot()
 
-    def _update_plot(self, caller, time):
-        """Update the plot."""
+    def _update_plot(self):
         if self._lines is None:
             self._lines = [
                 self._axes.plot(
-                    [datetime.min],
-                    i,
-                    label=h,
+                    self._infos[n].grid.data_axes[0],
+                    [0] * self._infos[n].grid.data_shape[0],
+                    label=n,
                     c=self._colors[i % len(self._colors)],
                     **self._plot_kwargs,
                 )[0]
-                for i, h in enumerate(self._input_names)
+                for i, n in enumerate(self._input_names)
             ]
+            self._axes.legend(loc=1)
 
         for i, inp in enumerate(self._input_names):
-            if self.inputs[inp] == caller:
-                self._x[i].append(time)
+            if self.inputs[inp] == self._caller:
+                value = fm.data.get_magnitude(
+                    fm.data.strip_time(self.inputs[inp].pull_data(self._time))
+                )
 
-        for i, line in enumerate(self._lines):
-            line.set_xdata(self._x[i])
-            line.set_ydata(i)
+                x = self._infos[inp].grid.data_axes[0]
+                y = value
+
+                self._lines[i].set_xdata(x)
+                self._lines[i].set_ydata(y)
 
         self._axes.relim()
         self._axes.autoscale_view(True, True, True)
