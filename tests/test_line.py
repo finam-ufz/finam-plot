@@ -2,6 +2,7 @@ import unittest
 from datetime import datetime, timedelta
 
 import finam as fm
+import numpy as np
 from matplotlib import pyplot
 
 from finam_plot import LinePlot
@@ -55,6 +56,58 @@ class TestLine(unittest.TestCase):
         )
         trigger_1.outputs["Out"] >> plot.inputs["In1"]
         trigger_2.outputs["Out"] >> plot.inputs["In2"]
+
+        comp.connect()
+        comp.run(datetime(2000, 1, 10))
+
+        pyplot.close("all")
+
+    def test_line_no_grid_1d(self):
+        start = datetime(2000, 1, 1)
+        grid = fm.NoGrid(dim=1)
+
+        source_1 = fm.modules.CallbackGenerator(
+            callbacks={
+                "Out": (
+                    lambda t: np.random.random((25,)),
+                    fm.Info(time=None, grid=grid),
+                )
+            },
+            start=start,
+            step=timedelta(days=1),
+        )
+        plot = LinePlot(["In1"])
+
+        comp = fm.Composition([source_1, plot])
+        comp.initialize()
+
+        (source_1.outputs["Out"] >> plot.inputs["In1"])
+
+        comp.connect()
+        comp.run(datetime(2000, 1, 10))
+
+        pyplot.close("all")
+
+    def test_line_no_grid_2d(self):
+        start = datetime(2000, 1, 1)
+        grid = fm.NoGrid(dim=2)
+
+        source_1 = fm.modules.CallbackGenerator(
+            callbacks={
+                "Out": (
+                    lambda t: np.random.random((25, 2)),
+                    fm.Info(time=None, grid=grid),
+                )
+            },
+            start=start,
+            step=timedelta(days=1),
+        )
+        plot = LinePlot(["In1"])
+
+        comp = fm.Composition([source_1, plot])
+        comp.initialize()
+
+        (source_1.outputs["Out"] >> plot.inputs["In1"])
 
         comp.connect()
         comp.run(datetime(2000, 1, 10))

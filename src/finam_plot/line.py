@@ -6,8 +6,11 @@ import matplotlib.pyplot as plt
 class LinePlot(fm.Component):
     """Line plot for multiple instant series, push-based.
 
-    Inputs are expected to be 1-D structured grids.
-    The axis is plotted as x, while the data is plotted as y.
+    Inputs are expected to be one of:
+
+    * 1-D structured grids. The axis is plotted as x, while the data is plotted as y.
+    * 1-D NoGrid. x is enumerated, data is plotted as y.
+    * 2-D NoGrid. x is the first column, while y is the second column.
 
     Uses :func:`matplotlib.pyplot.plot`.
 
@@ -137,8 +140,8 @@ class LinePlot(fm.Component):
         if self._lines is None:
             self._lines = [
                 self._axes.plot(
-                    self._infos[n].grid.data_axes[0],
-                    [0] * self._infos[n].grid.data_shape[0],
+                    [],
+                    [],
                     label=n,
                     c=self._colors[i % len(self._colors)],
                     **self._plot_kwargs,
@@ -149,12 +152,9 @@ class LinePlot(fm.Component):
 
         for i, inp in enumerate(self._input_names):
             if self.inputs[inp] == self._caller:
-                value = fm.data.get_magnitude(
-                    fm.data.strip_time(self.inputs[inp].pull_data(self._time))
-                )
+                value = self.inputs[inp].pull_data(self._time)
 
-                x = self._infos[inp].grid.data_axes[0]
-                y = value
+                x, y = self._extract_data(self._infos[inp].grid, value)
 
                 self._lines[i].set_xdata(x)
                 self._lines[i].set_ydata(y)
@@ -170,3 +170,17 @@ class LinePlot(fm.Component):
 
         After the method call, the component should have status FINALIZED.
         """
+
+    def _extract_data(self, grid, data):
+        raw = fm.data.get_magnitude(fm.data.strip_time(data))
+        if isinstance(grid, fm.NoGrid):
+            if grid.dim == 1:
+                return list(range(raw.shape[0])), raw
+
+            return raw[:, 0], raw[:, 1]
+
+        if isinstance(grid, fm.data.grid_tools.StructuredGrid):
+            return grid.data_axes[0], raw
+
+        with fm.tools.ErrorLogger(self.logger):
+            raise ValueError(f"Grid type {grid.__class__.__name__} not supported.")
