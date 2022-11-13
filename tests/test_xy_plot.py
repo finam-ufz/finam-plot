@@ -5,7 +5,7 @@ import finam as fm
 import numpy as np
 from matplotlib import pyplot
 
-from finam_plot import LinePlot
+from finam_plot import XyPlot
 
 
 class TestLine(unittest.TestCase):
@@ -39,7 +39,7 @@ class TestLine(unittest.TestCase):
             step=timedelta(days=1),
             in_info=fm.Info(time=None, grid=None, units=None),
         )
-        plot = LinePlot(["In1", "In2"])
+        plot = XyPlot(["In1", "In2"])
 
         comp = fm.Composition([source_1, source_2, trigger_1, trigger_2, plot])
         comp.initialize()
@@ -76,7 +76,7 @@ class TestLine(unittest.TestCase):
             start=start,
             step=timedelta(days=1),
         )
-        plot = LinePlot(["In1"])
+        plot = XyPlot(["In1"])
 
         comp = fm.Composition([source_1, plot])
         comp.initialize()
@@ -102,7 +102,7 @@ class TestLine(unittest.TestCase):
             start=start,
             step=timedelta(days=1),
         )
-        plot = LinePlot(["In1"])
+        plot = XyPlot(["In1"], ls="", marker="o")
 
         comp = fm.Composition([source_1, plot])
         comp.initialize()

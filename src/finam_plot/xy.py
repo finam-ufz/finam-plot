@@ -3,8 +3,8 @@ import finam as fm
 import matplotlib.pyplot as plt
 
 
-class LinePlot(fm.Component):
-    """Line plot for multiple instant series, push-based.
+class XyPlot(fm.Component):
+    """Line and scatter plots for multiple instant series, push-based.
 
     Inputs are expected to be one of:
 
@@ -18,7 +18,7 @@ class LinePlot(fm.Component):
 
                      +----------+
         --> [custom] |          |
-        --> [custom] | LinePlot |
+        --> [custom] |  XyPlot  |
         --> [......] |          |
                      +----------+
 
@@ -32,7 +32,7 @@ class LinePlot(fm.Component):
 
         import finam_plot as fmp
 
-        plot = fmp.LinePlot(
+        plot = fmp.XyPlot(
             inputs=["Value1", "Value2"],
             colors=["red", "#ff00ee"],
             marker="o", lw=2.0, # plot kwargs
