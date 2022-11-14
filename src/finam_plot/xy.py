@@ -2,6 +2,8 @@
 import finam as fm
 import matplotlib.pyplot as plt
 
+from .tools import convert_pos, convert_size, move_figure
+
 
 class XyPlot(fm.Component):
     """Line and scatter plots for multiple instant series, push-based.
@@ -51,11 +53,19 @@ class XyPlot(fm.Component):
         Title for plot and window.
     colors : list of str, optional
         List of colors for the inputs. Uses matplotlib default colors by default.
+    pos : tuple(number, number), optional
+        Figure position. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
+    size : tuple(number, number), optional
+        Figure size. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.plot`.
     """
 
-    def __init__(self, inputs, title=None, colors=None, **plot_kwargs):
+    def __init__(
+        self, inputs, title=None, colors=None, pos=None, size=None, **plot_kwargs
+    ):
         super().__init__()
         self._time = None
         self._caller = None
@@ -67,6 +77,7 @@ class XyPlot(fm.Component):
 
         self._input_names = inputs
         self._title = title
+        self._bounds = (convert_pos(pos), convert_size(size))
         self._plot_kwargs = plot_kwargs
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
@@ -87,7 +98,8 @@ class XyPlot(fm.Component):
                 )
             )
 
-        self._figure, self._axes = plt.subplots()
+        self._figure, self._axes = plt.subplots(figsize=self._bounds[1])
+        move_figure(self._figure, self._bounds[0])
 
         self._figure.tight_layout()
         self._figure.show()

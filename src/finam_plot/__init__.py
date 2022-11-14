@@ -31,6 +31,7 @@ Point and line plots
     XyPlot
 
 """
+from . import tools
 from .colormesh import ColorMeshPlot
 from .contour import ContourPlot
 from .grid_spec import GridSpecPlot

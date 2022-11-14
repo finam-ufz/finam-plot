@@ -5,6 +5,8 @@ import finam as fm
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
+from .tools import convert_pos, convert_size, move_figure
+
 
 class TimeSeriesPlot(fm.Component):
     """Line plot for multiple time series, push-based.
@@ -50,11 +52,19 @@ class TimeSeriesPlot(fm.Component):
         Title for plot and window.
     colors : list of str, optional
         List of colors for the inputs. Uses matplotlib default colors by default.
+    pos : tuple(number, number), optional
+        Figure position. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
+    size : tuple(number, number), optional
+        Figure size. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.plot`.
     """
 
-    def __init__(self, inputs, title=None, colors=None, **plot_kwargs):
+    def __init__(
+        self, inputs, title=None, colors=None, pos=None, size=None, **plot_kwargs
+    ):
         super().__init__()
         self._time = None
         self._caller = None
@@ -67,6 +77,7 @@ class TimeSeriesPlot(fm.Component):
 
         self._input_names = inputs
         self._title = title
+        self._bounds = (convert_pos(pos), convert_size(size))
         self._plot_kwargs = plot_kwargs
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
@@ -87,7 +98,9 @@ class TimeSeriesPlot(fm.Component):
                 )
             )
 
-        self._figure, self._axes = plt.subplots()
+        self._figure, self._axes = plt.subplots(figsize=self._bounds[1])
+        move_figure(self._figure, self._bounds[0])
+
         date_format = mdates.AutoDateFormatter(self._axes.xaxis)
         self._axes.xaxis.set_major_formatter(date_format)
         self._axes.tick_params(axis="x", labelrotation=20)
@@ -231,6 +244,12 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         Values are numbers of updates, i.e. whole-numbered factors for ``step``.
     update_interval : int, optional
          Redraw interval (independent of data retrieval).
+    pos : tuple(number, number), optional
+        Figure position. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
+    size : tuple(number, number), optional
+        Figure size. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.plot`.
     """
@@ -244,6 +263,8 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         colors=None,
         intervals=None,
         update_interval=1,
+        pos=None,
+        size=None,
         **plot_kwargs,
     ):
         super().__init__()
@@ -266,6 +287,7 @@ class StepTimeSeriesPlot(fm.TimeComponent):
 
         self._input_names = inputs
         self._title = title
+        self._bounds = (convert_pos(pos), convert_size(size))
         self._plot_kwargs = plot_kwargs
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
@@ -283,7 +305,8 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         for inp in self._input_names:
             self.inputs.add(name=inp)
 
-        self._figure, self._axes = plt.subplots()
+        self._figure, self._axes = plt.subplots(figsize=self._bounds[1])
+        move_figure(self._figure, self._bounds[0])
 
         self._figure.canvas.manager.set_window_title(self._title)
         self._axes.set_title(self._title)

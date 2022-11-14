@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.tri import Triangulation
 
+from .tools import convert_pos, convert_size, move_figure
+
 
 class ContourPlot(fm.Component):
     """Contour plot component for structured and unstructured grids
@@ -64,6 +66,12 @@ class ContourPlot(fm.Component):
         Whether to draw filled contours. Default ``True``.
     triangulate : bool, optional
         Allow/force triangulation. Default ``False``.
+    pos : tuple(number, number), optional
+        Figure position. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
+    size : tuple(number, number), optional
+        Figure size. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
     **plot_kwargs
         Keyword arguments passed to plot function. See the list of functions above.
     """
@@ -74,6 +82,8 @@ class ContourPlot(fm.Component):
         axes=(0, 1),
         fill=True,
         triangulate=False,
+        pos=None,
+        size=None,
         **plot_kwargs,
     ):
         super().__init__()
@@ -88,6 +98,7 @@ class ContourPlot(fm.Component):
         self._time_text = None
         self.triangulation = None
         self._title = title
+        self._bounds = (convert_pos(pos), convert_size(size))
         self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
@@ -134,7 +145,9 @@ class ContourPlot(fm.Component):
                 raise e
 
         if self._figure is None:
-            self._figure, self._plot_ax = plt.subplots()
+            self._figure, self._plot_ax = plt.subplots(figsize=self._bounds[1])
+            move_figure(self._figure, self._bounds[0])
+
             self._plot_ax.set_aspect("equal")
             self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
 

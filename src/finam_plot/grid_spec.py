@@ -4,6 +4,8 @@ import math
 import finam as fm
 import matplotlib.pyplot as plt
 
+from .tools import convert_pos, convert_size, move_figure
+
 
 class GridSpecPlot(fm.Component):
     """Plots the geometry of grid specifications
@@ -49,9 +51,17 @@ class GridSpecPlot(fm.Component):
         Tuple of axes indices or names. Default (0, 1).
     colors : list of str, optional
         List of colors for the inputs. Uses matplotlib default colors by default.
+    pos : tuple(number, number), optional
+        Figure position. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
+    size : tuple(number, number), optional
+        Figure size. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
     """
 
-    def __init__(self, inputs, title=None, axes=(0, 1), colors=None):
+    def __init__(
+        self, inputs, title=None, axes=(0, 1), colors=None, pos=None, size=None
+    ):
         super().__init__()
         self._figure = None
         self._names = inputs
@@ -68,6 +78,7 @@ class GridSpecPlot(fm.Component):
 
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
+        self._bounds = (convert_pos(pos), convert_size(size))
         self._infos = {name: None for name in self._names}
 
     def _initialize(self):
@@ -96,7 +107,8 @@ class GridSpecPlot(fm.Component):
         pass
 
     def _update_plot(self):
-        self._figure, axes = plt.subplots()
+        self._figure, axes = plt.subplots(figsize=self._bounds[1])
+        move_figure(self._figure, self._bounds[0])
         axes.set_aspect("equal")
 
         self._figure.canvas.manager.set_window_title(self._title)
