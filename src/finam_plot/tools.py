@@ -9,12 +9,7 @@ def convert_pos(position):
         return None
 
     window = plt.get_current_fig_manager().window
-    dpi = window.winfo_fpixels("1i")
-    scale = dpi / 96
-
     screen_x, screen_y = window.wm_maxsize()
-    screen_x /= scale
-    screen_y /= scale
 
     return (
         position[0] if isinstance(position[0], int) else int(position[0] * screen_x),
@@ -27,11 +22,25 @@ def convert_size(position):
     if position is None:
         return None
 
-    pos = convert_pos(position)
+    window = plt.get_current_fig_manager().window
+    dpi = window.winfo_fpixels("1i")
+    scale = dpi / 96
+
+    screen_x, screen_y = window.wm_maxsize()
+    screen_x /= scale
+    screen_y /= scale
 
     px = 1 / plt.rcParams["figure.dpi"]
 
-    return pos[0] * px, pos[1] * px
+    pos = (
+        position[0] if isinstance(position[0], int) else int(position[0] * screen_x),
+        position[1] if isinstance(position[1], int) else int(position[1] * screen_y),
+    )
+
+    return (
+        pos[0] * px,
+        pos[1] * px,
+    )
 
 
 def move_figure(f, pos):
