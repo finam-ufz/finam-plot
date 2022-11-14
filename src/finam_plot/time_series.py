@@ -159,9 +159,8 @@ class TimeSeriesPlot(fm.Component):
                 self._x[i].append(self._time)
                 self._data[i].append(value)
 
-        for i, line in enumerate(self._lines):
-            line.set_xdata(self._x[i])
-            line.set_ydata(self._data[i])
+                self._lines[i].set_xdata(self._x[i])
+                self._lines[i].set_ydata(self._data[i])
 
         self._axes.relim()
         self._axes.autoscale_view(True, True, True)

@@ -28,6 +28,7 @@ Point and line plots
     SchedulePlot
     StepTimeSeriesPlot
     TimeSeriesPlot
+    XyPlot
 
 """
 from .colormesh import ColorMeshPlot
@@ -36,6 +37,7 @@ from .grid_spec import GridSpecPlot
 from .image import ImagePlot
 from .schedule import SchedulePlot
 from .time_series import StepTimeSeriesPlot, TimeSeriesPlot
+from .xy import XyPlot
 
 try:
     from ._version import __version__
@@ -48,6 +50,7 @@ __all__ = [
     "ContourPlot",
     "GridSpecPlot",
     "ImagePlot",
+    "XyPlot",
     "SchedulePlot",
     "StepTimeSeriesPlot",
     "TimeSeriesPlot",
