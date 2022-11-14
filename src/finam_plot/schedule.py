@@ -88,6 +88,7 @@ class SchedulePlot(fm.Component):
         date_format = mdates.AutoDateFormatter(self._axes.xaxis)
         self._axes.xaxis.set_major_formatter(date_format)
         self._axes.tick_params(axis="x", labelrotation=20)
+        self._axes.invert_yaxis()
         self._axes.set_yticks(range(len(self._input_names)))
         self._axes.set_yticklabels(self._input_names)
 
