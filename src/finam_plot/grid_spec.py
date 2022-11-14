@@ -51,10 +51,16 @@ class GridSpecPlot(fm.Component):
         Tuple of axes indices or names. Default (0, 1).
     colors : list of str, optional
         List of colors for the inputs. Uses matplotlib default colors by default.
+    pos : tuple(number, number), optional
+        Figure position. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
+    size : tuple(number, number), optional
+        Figure size. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
     """
 
     def __init__(
-        self, inputs, title=None, axes=(0, 1), pos=None, size=None, colors=None
+        self, inputs, title=None, axes=(0, 1), colors=None, pos=None, size=None
     ):
         super().__init__()
         self._figure = None

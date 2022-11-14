@@ -53,6 +53,12 @@ class XyPlot(fm.Component):
         Title for plot and window.
     colors : list of str, optional
         List of colors for the inputs. Uses matplotlib default colors by default.
+    pos : tuple(number, number), optional
+        Figure position. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
+    size : tuple(number, number), optional
+        Figure size. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.plot`.
     """

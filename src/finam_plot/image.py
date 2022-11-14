@@ -49,6 +49,12 @@ class ImagePlot(fm.Component):
         Title for plot and window.
     axes : (int, int) or (str, str), optional
         Tuple of axes indices or names. Default (0, 1).
+    pos : tuple(number, number), optional
+        Figure position. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
+    size : tuple(number, number), optional
+        Figure size. ``int`` is interpreted as pixels,
+        ``float`` is interpreted as fraction of screen size.
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.imshow`.
     """
