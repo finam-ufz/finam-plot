@@ -149,11 +149,9 @@ class ImagePlot(fm.Component):
                     g.axes[ax_2][-1] + g.spacing[ax_2] / 2,
                 ]
             )
+            self._figure.show()
 
         self._plot_image(data, (ax_1, ax_2))
-
-        self._figure.show()
-        self._figure.tight_layout()
 
         self._figure.canvas.draw()
         self._figure.canvas.flush_events()
@@ -182,6 +180,7 @@ class ImagePlot(fm.Component):
                 **self._plot_kwargs,
             )
             self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
+            self._figure.tight_layout()
         else:
             self._image.set_data(data)
             self._time_text.set_text(self._time)

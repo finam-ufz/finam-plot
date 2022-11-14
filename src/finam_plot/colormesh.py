@@ -123,6 +123,7 @@ class ColorMeshPlot(fm.Component):
 
             self._figure.canvas.manager.set_window_title(self._title)
             self._plot_ax.set_title(self._title)
+            self._figure.show()
 
         axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
         axes_indices = [
@@ -133,9 +134,6 @@ class ColorMeshPlot(fm.Component):
         ax_2 = axes_indices[1]
 
         self._plot_image(data, (ax_1, ax_2))
-
-        self._figure.show()
-        self._figure.tight_layout()
 
         self._figure.canvas.draw()
         self._figure.canvas.flush_events()
@@ -165,6 +163,7 @@ class ColorMeshPlot(fm.Component):
                 **self._plot_kwargs,
             )
             self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
+            self._figure.tight_layout()
         else:
             self._mesh.set_array(data.ravel())
             self._time_text.set_text(self._time)

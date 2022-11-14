@@ -140,6 +140,7 @@ class ContourPlot(fm.Component):
 
             self._figure.canvas.manager.set_window_title(self._title)
             self._plot_ax.set_title(self._title)
+            self._figure.show()
         else:
             self._time_text.set_text(self._time)
 
@@ -160,7 +161,6 @@ class ContourPlot(fm.Component):
         else:
             self._plot_structured(data, (ax_1, ax_2))
 
-        self._figure.show()
         self._figure.tight_layout()
 
         self._figure.canvas.draw()
