@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.tri import Triangulation
 
+from .tools import convert_pos, convert_size, move_figure
+
 
 class ContourPlot(fm.Component):
     """Contour plot component for structured and unstructured grids
@@ -72,6 +74,8 @@ class ContourPlot(fm.Component):
         self,
         title=None,
         axes=(0, 1),
+        pos=None,
+        size=None,
         fill=True,
         triangulate=False,
         **plot_kwargs,
@@ -88,6 +92,7 @@ class ContourPlot(fm.Component):
         self._time_text = None
         self.triangulation = None
         self._title = title
+        self._bounds = (convert_pos(pos), convert_size(size))
         self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
@@ -134,7 +139,9 @@ class ContourPlot(fm.Component):
                 raise e
 
         if self._figure is None:
-            self._figure, self._plot_ax = plt.subplots()
+            self._figure, self._plot_ax = plt.subplots(figsize=self._bounds[1])
+            move_figure(self._figure, self._bounds[0])
+            
             self._plot_ax.set_aspect("equal")
             self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
 

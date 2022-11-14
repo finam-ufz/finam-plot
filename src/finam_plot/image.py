@@ -5,6 +5,8 @@ import finam as fm
 import matplotlib.pyplot as plt
 import numpy as np
 
+from .tools import convert_pos, convert_size, move_figure
+
 
 class ImagePlot(fm.Component):
     """Raster image plot component for uniform grids.
@@ -51,7 +53,7 @@ class ImagePlot(fm.Component):
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.imshow`.
     """
 
-    def __init__(self, title=None, axes=(0, 1), **plot_kwargs):
+    def __init__(self, title=None, axes=(0, 1), pos=None, size=None, **plot_kwargs):
         super().__init__()
         self._time = None
         self._figure = None
@@ -62,6 +64,7 @@ class ImagePlot(fm.Component):
         self._extent = None
         self._title = title
         self._time_text = None
+        self._bounds = (convert_pos(pos), convert_size(size))
         self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
@@ -124,7 +127,9 @@ class ImagePlot(fm.Component):
         ax_2 = axes_indices[1]
 
         if self._figure is None:
-            self._figure, self._plot_ax = plt.subplots()
+            self._figure, self._plot_ax = plt.subplots(figsize=self._bounds[1])
+            move_figure(self._figure, self._bounds[0])
+
             self._plot_ax.set_aspect("equal")
 
             self._figure.canvas.manager.set_window_title(self._title)
