@@ -1,6 +1,16 @@
 """Tool functions."""
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.cm import ScalarMappable
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+
+def create_colorbar(figure, axes, mappable):
+    """Add a colorbar by creating a new plot axes"""
+    divider = make_axes_locatable(axes)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    mappable = ScalarMappable(norm=mappable.norm, cmap=mappable.cmap)
+    figure.colorbar(mappable, cax=cax, orientation="vertical")
 
 
 def convert_pos(position):
