@@ -5,7 +5,7 @@ import finam as fm
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .tools import convert_pos, convert_size, move_figure
+from .tools import convert_pos, convert_size, create_colorbar, move_figure
 
 
 class ImagePlot(fm.Component):
@@ -191,6 +191,8 @@ class ImagePlot(fm.Component):
                 **self._plot_kwargs,
             )
             self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
+
+            create_colorbar(self._figure, self._plot_ax, self._image)
             self._figure.tight_layout()
         else:
             self._image.set_data(data)

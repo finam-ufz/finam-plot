@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.tri import Triangulation
 
-from .tools import convert_pos, convert_size, move_figure
+from .tools import convert_pos, convert_size, create_colorbar, move_figure
 
 
 class ContourPlot(fm.Component):
@@ -157,9 +157,11 @@ class ContourPlot(fm.Component):
         else:
             self._time_text.set_text(self._time)
 
+        first_plot = True
         if self._contours is not None:
             self._plot_ax.clear()
             self._plot_ax.set_title(self._title)
+            first_plot = False
 
         axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
         axes_indices = [
@@ -174,7 +176,9 @@ class ContourPlot(fm.Component):
         else:
             self._plot_structured(data, (ax_1, ax_2))
 
-        self._figure.tight_layout()
+        if first_plot:
+            create_colorbar(self._figure, self._plot_ax, self._contours)
+            self._figure.tight_layout()
 
         self._figure.canvas.draw()
         self._figure.canvas.flush_events()
