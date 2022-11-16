@@ -91,21 +91,6 @@ class SchedulePlot(fm.Component):
                 fm.CallbackInput(self._data_changed, name=inp, time=None, grid=None)
             )
 
-        self._figure, self._axes = create_figure(self._bounds)
-
-        self._figure.canvas.manager.set_window_title(self._title)
-        self._axes.set_title(self._title)
-
-        date_format = mdates.AutoDateFormatter(self._axes.xaxis)
-        self._axes.xaxis.set_major_formatter(date_format)
-        self._axes.tick_params(axis="x", labelrotation=20)
-        self._axes.invert_yaxis()
-        self._axes.set_yticks(range(len(self._input_names)))
-        self._axes.set_yticklabels(self._input_names)
-
-        self._figure.tight_layout()
-        self._figure.show()
-
         self.create_connector()
 
     def _connect(self):
@@ -113,6 +98,21 @@ class SchedulePlot(fm.Component):
 
         After the method call, the component should have status CONNECTED.
         """
+        if self._figure is None:
+            self._figure, self._axes = create_figure(self._bounds)
+
+            self._figure.canvas.manager.set_window_title(self._title)
+            self._axes.set_title(self._title)
+
+            date_format = mdates.AutoDateFormatter(self._axes.xaxis)
+            self._axes.xaxis.set_major_formatter(date_format)
+            self._axes.tick_params(axis="x", labelrotation=20)
+            self._axes.invert_yaxis()
+            self._axes.set_yticks(range(len(self._input_names)))
+            self._axes.set_yticklabels(self._input_names)
+
+            self._figure.tight_layout()
+
         self.try_connect()
 
     def _validate(self):
@@ -120,6 +120,7 @@ class SchedulePlot(fm.Component):
 
         After the method call, the component should have status VALIDATED.
         """
+        self._figure.show()
 
     def _data_changed(self, caller, time):
         """Update for changed data.

@@ -98,11 +98,6 @@ class XyPlot(fm.Component):
                 )
             )
 
-        self._figure, self._axes = create_figure(self._bounds)
-
-        self._figure.tight_layout()
-        self._figure.show()
-
         self.create_connector()
 
     def _connect(self):
@@ -110,6 +105,12 @@ class XyPlot(fm.Component):
 
         After the method call, the component should have status CONNECTED.
         """
+        if self._figure is None:
+            self._figure, self._axes = create_figure(self._bounds)
+
+            self._figure.tight_layout()
+            self._figure.show()
+
         self.try_connect()
 
         if self.status == fm.ComponentStatus.CONNECTED:
