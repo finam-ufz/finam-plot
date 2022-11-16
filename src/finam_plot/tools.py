@@ -35,7 +35,12 @@ def convert_pos(position):
     if position is None:
         return None
 
-    window = plt.get_current_fig_manager().window
+    manager = plt.get_current_fig_manager()
+
+    if not hasattr(manager, "window"):
+        return None
+
+    window = manager.window
     screen_x, screen_y = window.wm_maxsize()
 
     return (
@@ -49,7 +54,12 @@ def convert_size(position):
     if position is None:
         return None
 
-    window = plt.get_current_fig_manager().window
+    manager = plt.get_current_fig_manager()
+
+    if not hasattr(manager, "window"):
+        return None
+
+    window = manager.window
     dpi = window.winfo_fpixels("1i")
     scale = dpi / 96
 
