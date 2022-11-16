@@ -5,7 +5,7 @@ import finam as fm
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
-from .tools import convert_pos, convert_size, move_figure
+from .tools import create_figure
 
 
 class SchedulePlot(fm.Component):
@@ -75,7 +75,7 @@ class SchedulePlot(fm.Component):
         self._title = title
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
-        self._bounds = (convert_pos(pos), convert_size(size))
+        self._bounds = (pos, size)
         self._plot_kwargs = plot_kwargs
         if "marker" not in self._plot_kwargs:
             self._plot_kwargs["marker"] = "+"
@@ -91,8 +91,7 @@ class SchedulePlot(fm.Component):
                 fm.CallbackInput(self._data_changed, name=inp, time=None, grid=None)
             )
 
-        self._figure, self._axes = plt.subplots(figsize=self._bounds[1])
-        move_figure(self._figure, self._bounds[0])
+        self._figure, self._axes = create_figure(self._bounds)
 
         self._figure.canvas.manager.set_window_title(self._title)
         self._axes.set_title(self._title)

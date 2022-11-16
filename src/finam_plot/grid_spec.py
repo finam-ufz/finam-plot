@@ -4,7 +4,7 @@ import math
 import finam as fm
 import matplotlib.pyplot as plt
 
-from .tools import convert_pos, convert_size, move_figure
+from .tools import create_figure
 
 
 class GridSpecPlot(fm.Component):
@@ -78,7 +78,7 @@ class GridSpecPlot(fm.Component):
 
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
-        self._bounds = (convert_pos(pos), convert_size(size))
+        self._bounds = (pos, size)
         self._infos = {name: None for name in self._names}
 
     def _initialize(self):
@@ -107,8 +107,7 @@ class GridSpecPlot(fm.Component):
         pass
 
     def _update_plot(self):
-        self._figure, axes = plt.subplots(figsize=self._bounds[1])
-        move_figure(self._figure, self._bounds[0])
+        self._figure, axes = create_figure(self._bounds)
         axes.set_aspect("equal")
 
         self._figure.canvas.manager.set_window_title(self._title)

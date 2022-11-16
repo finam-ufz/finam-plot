@@ -10,7 +10,7 @@ from finam_plot import ImagePlot
 
 
 class TestImage(unittest.TestCase):
-    def test_image_unifform(self):
+    def test_image_uniform(self):
         info_1 = fm.Info(
             time=None,
             grid=fm.UniformGrid(
@@ -43,7 +43,7 @@ class TestImage(unittest.TestCase):
             step=timedelta(days=1),
         )
 
-        plot = ImagePlot(axes=(0, 1), vmin=0, vmax=1)
+        plot = ImagePlot(axes=(0, 1), pos=(0.2, 0.2), size=(0.33, 0.4), vmin=0, vmax=1)
 
         comp = fm.Composition([source, plot])
         comp.initialize()
