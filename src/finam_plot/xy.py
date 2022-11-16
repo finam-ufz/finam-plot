@@ -2,7 +2,7 @@
 import finam as fm
 import matplotlib.pyplot as plt
 
-from .tools import convert_pos, convert_size, move_figure
+from .tools import create_figure
 
 
 class XyPlot(fm.Component):
@@ -77,7 +77,7 @@ class XyPlot(fm.Component):
 
         self._input_names = inputs
         self._title = title
-        self._bounds = (convert_pos(pos), convert_size(size))
+        self._bounds = (pos, size)
         self._plot_kwargs = plot_kwargs
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
@@ -98,8 +98,7 @@ class XyPlot(fm.Component):
                 )
             )
 
-        self._figure, self._axes = plt.subplots(figsize=self._bounds[1])
-        move_figure(self._figure, self._bounds[0])
+        self._figure, self._axes = create_figure(self._bounds)
 
         self._figure.tight_layout()
         self._figure.show()

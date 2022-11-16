@@ -2,10 +2,9 @@
 from datetime import datetime
 
 import finam as fm
-import matplotlib.pyplot as plt
 import numpy as np
 
-from .tools import convert_pos, convert_size, create_colorbar, move_figure
+from .tools import create_colorbar, create_figure
 
 
 class ColorMeshPlot(fm.Component):
@@ -70,7 +69,7 @@ class ColorMeshPlot(fm.Component):
         self._mesh = None
         self._time_text = None
         self._title = title
-        self._bounds = (convert_pos(pos), convert_size(size))
+        self._bounds = (pos, size)
         self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
@@ -127,8 +126,7 @@ class ColorMeshPlot(fm.Component):
                 raise e
 
         if self._figure is None:
-            self._figure, self._plot_ax = plt.subplots(figsize=self._bounds[1])
-            move_figure(self._figure, self._bounds[0])
+            self._figure, self._plot_ax = create_figure(self._bounds)
 
             self._plot_ax.set_aspect("equal")
 

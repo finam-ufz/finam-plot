@@ -13,8 +13,25 @@ def create_colorbar(figure, axes, mappable):
     figure.colorbar(mappable, cax=cax, orientation="vertical")
 
 
+def create_figure(bounds):
+    """Creates a figure and plot axes"""
+    figure, plot_ax = plt.subplots()
+    pos, size = convert_bounds(bounds)
+    move_figure(figure, pos)
+
+    if size is not None:
+        figure.set_size_inches(*size)
+
+    return figure, plot_ax
+
+
+def convert_bounds(bounds):
+    """Convert position and size in pixels or percentage to coordinates in pixels"""
+    return convert_pos(bounds[0]), convert_size(bounds[1])
+
+
 def convert_pos(position):
-    """Convert a position in pixels of percentage to coordinates in pixels"""
+    """Convert a position in pixels or percentage to coordinates in pixels"""
     if position is None:
         return None
 
@@ -28,7 +45,7 @@ def convert_pos(position):
 
 
 def convert_size(position):
-    """Convert a size in pixels of percentage to coordinates in inches"""
+    """Convert a size in pixels or percentage to coordinates in inches"""
     if position is None:
         return None
 
