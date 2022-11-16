@@ -98,15 +98,6 @@ class TimeSeriesPlot(fm.Component):
                 )
             )
 
-        self._figure, self._axes = create_figure(self._bounds)
-
-        date_format = mdates.AutoDateFormatter(self._axes.xaxis)
-        self._axes.xaxis.set_major_formatter(date_format)
-        self._axes.tick_params(axis="x", labelrotation=20)
-
-        self._figure.tight_layout()
-        self._figure.show()
-
         self.create_connector()
 
     def _connect(self):
@@ -114,6 +105,15 @@ class TimeSeriesPlot(fm.Component):
 
         After the method call, the component should have status CONNECTED.
         """
+        if self._figure is None:
+            self._figure, self._axes = create_figure(self._bounds)
+
+            date_format = mdates.AutoDateFormatter(self._axes.xaxis)
+            self._axes.xaxis.set_major_formatter(date_format)
+            self._axes.tick_params(axis="x", labelrotation=20)
+
+            self._figure.tight_layout()
+
         self.try_connect()
 
     def _validate(self):
@@ -121,6 +121,7 @@ class TimeSeriesPlot(fm.Component):
 
         After the method call, the component should have status VALIDATED.
         """
+        self._figure.show()
         self._update_plot()
 
     def _data_changed(self, caller, time):
@@ -304,17 +305,6 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         for inp in self._input_names:
             self.inputs.add(name=inp)
 
-        self._figure, self._axes = create_figure(self._bounds)
-
-        self._figure.canvas.manager.set_window_title(self._title)
-        self._axes.set_title(self._title)
-
-        date_format = mdates.AutoDateFormatter(self._axes.xaxis)
-        self._axes.xaxis.set_major_formatter(date_format)
-        self._axes.tick_params(axis="x", labelrotation=20)
-
-        self._figure.show()
-
         self.create_connector()
 
     def _connect(self):
@@ -333,6 +323,16 @@ class StepTimeSeriesPlot(fm.TimeComponent):
 
         After the method call, the component should have status VALIDATED.
         """
+        self._figure, self._axes = create_figure(self._bounds)
+
+        self._figure.canvas.manager.set_window_title(self._title)
+        self._axes.set_title(self._title)
+
+        date_format = mdates.AutoDateFormatter(self._axes.xaxis)
+        self._axes.xaxis.set_major_formatter(date_format)
+        self._axes.tick_params(axis="x", labelrotation=20)
+
+        self._figure.show()
 
     def _update(self):
         """Update the component by one time step.
