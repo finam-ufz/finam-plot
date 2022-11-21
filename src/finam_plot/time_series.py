@@ -98,7 +98,7 @@ class TimeSeriesPlot(fm.Component):
                 )
             )
 
-        self.create_connector()
+        self.create_connector(pull_data=self._input_names)
 
     def _connect(self):
         """Push initial values to outputs.
@@ -121,8 +121,9 @@ class TimeSeriesPlot(fm.Component):
 
         After the method call, the component should have status VALIDATED.
         """
-        self._figure.show()
+        self._caller = None
         self._update_plot()
+        self._figure.show()
 
     def _data_changed(self, caller, time):
         """Update for changed data.
@@ -139,8 +140,6 @@ class TimeSeriesPlot(fm.Component):
 
         if self.status in (fm.ComponentStatus.UPDATED, fm.ComponentStatus.VALIDATED):
             self.update()
-        else:
-            self._update_plot()
 
     def _update(self):
         """Update the component by one time step and push new values to outputs.
@@ -165,10 +164,9 @@ class TimeSeriesPlot(fm.Component):
                     )[0]
                 )
             self._axes.legend(loc=1)
-            self._axes.legend(loc=1)
 
         for i, inp in enumerate(self._input_names):
-            if self.inputs[inp] == self._caller:
+            if self._caller is None or self.inputs[inp] == self._caller:
                 value = fm.data.get_magnitude(
                     fm.data.strip_time(self.inputs[inp].pull_data(self._time))
                 )
