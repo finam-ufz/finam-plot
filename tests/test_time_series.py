@@ -12,7 +12,9 @@ class TestStepTimeSeries(unittest.TestCase):
         start = datetime(2000, 1, 1)
 
         gen1 = fm.modules.CallbackGenerator(
-            callbacks={"Out": (lambda t: 0, fm.Info(None, grid=fm.NoGrid()))},
+            callbacks={
+                "Out": (lambda t: 0, fm.Info(None, grid=fm.NoGrid(), units="m/s"))
+            },
             start=start,
             step=timedelta(days=1),
         )
@@ -54,7 +56,9 @@ class TestPushTimeSeries(unittest.TestCase):
         start = datetime(2000, 1, 1)
 
         gen1 = fm.modules.CallbackGenerator(
-            callbacks={"Out": (lambda t: 0, fm.Info(None, grid=fm.NoGrid()))},
+            callbacks={
+                "Out": (lambda t: 0, fm.Info(None, grid=fm.NoGrid(), units="m/s"))
+            },
             start=start,
             step=timedelta(days=1),
         )

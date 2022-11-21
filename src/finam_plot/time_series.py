@@ -151,16 +151,20 @@ class TimeSeriesPlot(fm.Component):
 
     def _update_plot(self):
         if self._lines is None:
-            self._lines = [
-                self._axes.plot(
-                    [],
-                    [],
-                    label=h,
-                    c=self._colors[i % len(self._colors)],
-                    **self._plot_kwargs,
-                )[0]
-                for i, h in enumerate(self._input_names)
-            ]
+            self._lines = []
+            for i, n in enumerate(self._input_names):
+                units = self.inputs[n].info.meta.get("units")
+                units = f" [{units}]" if units else ""
+                self._lines.append(
+                    self._axes.plot(
+                        [],
+                        [],
+                        label=n + units,
+                        c=self._colors[i % len(self._colors)],
+                        **self._plot_kwargs,
+                    )[0]
+                )
+            self._axes.legend(loc=1)
             self._axes.legend(loc=1)
 
         for i, inp in enumerate(self._input_names):
@@ -343,16 +347,19 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         self._time += self._step
 
         if self._lines is None:
-            self._lines = [
-                self._axes.plot(
-                    [],
-                    [],
-                    label=h,
-                    c=self._colors[i % len(self._colors)],
-                    **self._plot_kwargs,
-                )[0]
-                for i, h in enumerate(self._input_names)
-            ]
+            self._lines = []
+            for i, n in enumerate(self._input_names):
+                units = self.inputs[n].info.meta.get("units")
+                units = f" [{units}]" if units else ""
+                self._lines.append(
+                    self._axes.plot(
+                        [],
+                        [],
+                        label=n + units,
+                        c=self._colors[i % len(self._colors)],
+                        **self._plot_kwargs,
+                    )[0]
+                )
             self._axes.legend(loc=1)
 
         for i, inp in enumerate(self._input_names):

@@ -9,7 +9,7 @@ if __name__ == "__main__":
     grid = fm.NoGrid()
 
     source_1 = fm.modules.SimplexNoise(
-        info=fm.Info(None, grid=grid, units=""),
+        info=fm.Info(None, grid=grid, units="m"),
         frequency=0.05,
         time_frequency=1.0 / (100 * 24 * 3600),
         octaves=3,
