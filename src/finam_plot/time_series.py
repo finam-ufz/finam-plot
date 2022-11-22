@@ -111,6 +111,9 @@ class TimeSeriesPlot(fm.Component):
         if self._figure is None:
             self._figure, self._axes = create_figure(self._bounds)
 
+            self._figure.canvas.manager.set_window_title(self._title)
+            self._axes.set_title(self._title)
+
             date_format = mdates.AutoDateFormatter(self._axes.xaxis)
             self._axes.xaxis.set_major_formatter(date_format)
             self._axes.tick_params(axis="x", labelrotation=20)
