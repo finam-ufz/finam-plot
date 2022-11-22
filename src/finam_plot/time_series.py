@@ -46,8 +46,9 @@ class TimeSeriesPlot(fm.Component):
 
     Parameters
     ----------
-    inputs : list of str
+    inputs : list of str or dict of str, str
         List of input names (plot series) that will become available for coupling.
+        Can also be a dictionary with units as values.
     title : str, optional
         Title for plot and window.
     colors : list of str, optional
@@ -75,7 +76,9 @@ class TimeSeriesPlot(fm.Component):
         self._x = [[] for _ in inputs]
         self._lines = None
 
-        self._input_names = inputs
+        self._input_units = (
+            inputs if isinstance(inputs, dict) else {n: None for n in inputs}
+        )
         self._title = title
         self._bounds = (pos, size)
         self._plot_kwargs = plot_kwargs
@@ -87,18 +90,18 @@ class TimeSeriesPlot(fm.Component):
         After the method call, the component's inputs and outputs must be available,
         and the component should have status INITIALIZED.
         """
-        for inp in self._input_names:
+        for inp, units in self._input_units.items():
             self.inputs.add(
                 fm.CallbackInput(
                     self._data_changed,
                     name=inp,
                     time=None,
                     grid=fm.NoGrid(),
-                    units=None,
+                    units=units,
                 )
             )
 
-        self.create_connector(pull_data=self._input_names)
+        self.create_connector(pull_data=self._input_units.keys())
 
     def _connect(self):
         """Push initial values to outputs.
@@ -107,6 +110,9 @@ class TimeSeriesPlot(fm.Component):
         """
         if self._figure is None:
             self._figure, self._axes = create_figure(self._bounds)
+
+            self._figure.canvas.manager.set_window_title(self._title)
+            self._axes.set_title(self._title)
 
             date_format = mdates.AutoDateFormatter(self._axes.xaxis)
             self._axes.xaxis.set_major_formatter(date_format)
@@ -151,7 +157,7 @@ class TimeSeriesPlot(fm.Component):
     def _update_plot(self):
         if self._lines is None:
             self._lines = []
-            for i, n in enumerate(self._input_names):
+            for i, n in enumerate(self._input_units):
                 units = self.inputs[n].info.meta.get("units")
                 units = f" [{units}]" if units else ""
                 self._lines.append(
@@ -165,7 +171,7 @@ class TimeSeriesPlot(fm.Component):
                 )
             self._axes.legend(loc=1)
 
-        for i, inp in enumerate(self._input_names):
+        for i, inp in enumerate(self._input_units):
             if self._caller is None or self.inputs[inp] == self._caller:
                 value = fm.data.get_magnitude(
                     fm.data.strip_time(self.inputs[inp].pull_data(self._time))
@@ -231,8 +237,9 @@ class StepTimeSeriesPlot(fm.TimeComponent):
 
     Parameters
     ----------
-    inputs : list of str
+    inputs : list of str or dict of str, str
         List of input names (plot series) that will become available for coupling.
+        Can also be a dictionary with units as values.
     start : datetime
         Starting time.
     step : timedelta
@@ -287,7 +294,9 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         self._x = [[] for _ in inputs]
         self._lines = None
 
-        self._input_names = inputs
+        self._input_units = (
+            inputs if isinstance(inputs, dict) else {n: None for n in inputs}
+        )
         self._title = title
         self._bounds = (pos, size)
         self._plot_kwargs = plot_kwargs
@@ -304,8 +313,8 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         After the method call, the component's inputs and outputs must be available,
         and the component should have status INITIALIZED.
         """
-        for inp in self._input_names:
-            self.inputs.add(name=inp)
+        for inp, units in self._input_units.items():
+            self.inputs.add(name=inp, time=self.time, grid=fm.NoGrid(), units=units)
 
         self.create_connector()
 
@@ -314,11 +323,7 @@ class StepTimeSeriesPlot(fm.TimeComponent):
 
         After the method call, the component should have status CONNECTED.
         """
-        self.try_connect(
-            exchange_infos={
-                name: fm.Info(time=self.time, grid=fm.NoGrid()) for name in self.inputs
-            }
-        )
+        self.try_connect()
 
     def _validate(self):
         """Validate the correctness of the component's settings and coupling.
@@ -346,7 +351,7 @@ class StepTimeSeriesPlot(fm.TimeComponent):
 
         if self._lines is None:
             self._lines = []
-            for i, n in enumerate(self._input_names):
+            for i, n in enumerate(self._input_units):
                 units = self.inputs[n].info.meta.get("units")
                 units = f" [{units}]" if units else ""
                 self._lines.append(
@@ -360,7 +365,7 @@ class StepTimeSeriesPlot(fm.TimeComponent):
                 )
             self._axes.legend(loc=1)
 
-        for i, inp in enumerate(self._input_names):
+        for i, inp in enumerate(self._input_units):
             if self._updates % self._intervals[i] == 0:
                 value = fm.data.get_magnitude(
                     fm.data.strip_time(self.inputs[inp].pull_data(self.time))
