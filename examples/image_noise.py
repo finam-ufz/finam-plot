@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from finam_plot import ImagePlot
 
 if __name__ == "__main__":
-    grid = fm.UniformGrid((30, 20))
+    grid = fm.UniformGrid((30, 20), order="C")
 
     source = fm.modules.SimplexNoise(
         info=fm.Info(None, grid=grid, units=""),
