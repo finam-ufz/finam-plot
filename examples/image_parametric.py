@@ -8,7 +8,7 @@ from finam_plot import ImagePlot
 
 if __name__ == "__main__":
     start = datetime(2000, 1, 1)
-    grid = fm.UniformGrid((50, 40))
+    grid = fm.UniformGrid((50, 40), order="C")
 
     def func(t, x, y):
         days = (t - start).days
