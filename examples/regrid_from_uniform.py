@@ -5,9 +5,9 @@ import numpy as np
 from finam_plot import ContourPlot, GridSpecPlot, ImagePlot
 
 if __name__ == "__main__":
-    in_grid = fm.UniformGrid((21, 17))
+    in_grid = fm.UniformGrid((21, 17), order="C")
 
-    uniform_grid = fm.UniformGrid((51, 41), spacing=(0.4, 0.4))
+    uniform_grid = fm.UniformGrid((51, 41), spacing=(0.4, 0.4), order="C")
 
     px = np.random.uniform(0, 20, 500)
     py = np.random.uniform(0, 16, 500)

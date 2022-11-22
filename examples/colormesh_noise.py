@@ -9,7 +9,7 @@ from finam_plot import ColorMeshPlot
 if __name__ == "__main__":
     x = np.linspace(0, 29, 30) + np.random.uniform(-0.4, 0.4, (30,))
     y = np.linspace(0, 19, 20) + np.random.uniform(-0.4, 0.4, (20,))
-    grid = fm.RectilinearGrid([x, y])
+    grid = fm.RectilinearGrid([x, y], order="C")
 
     source = fm.modules.SimplexNoise(
         info=fm.Info(None, grid=grid, units=""),

@@ -167,11 +167,9 @@ class ImagePlot(fm.Component):
 
     def _plot_image(self, data, axes):
         if axes == (0, 1):
-            if self._info.grid.order == "F":
-                data = data.transpose()
+            data = data.transpose()
         elif axes == (1, 0):
-            if self._info.grid.order == "C":
-                data = data.transpose()
+            pass
         else:
             raise ValueError(f"Unsupported axes: {axes}")
 
