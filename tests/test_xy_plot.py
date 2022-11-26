@@ -58,7 +58,7 @@ class TestLine(unittest.TestCase):
         trigger_2.outputs["Out"] >> plot.inputs["In2"]
 
         comp.connect()
-        comp.run(datetime(2000, 1, 10))
+        comp.run(t_max=datetime(2000, 1, 10))
 
         pyplot.close("all")
 
@@ -83,8 +83,7 @@ class TestLine(unittest.TestCase):
 
         (source_1.outputs["Out"] >> plot.inputs["In1"])
 
-        comp.connect()
-        comp.run(datetime(2000, 1, 10))
+        comp.run(t_max=datetime(2000, 1, 10))
 
         pyplot.close("all")
 
@@ -109,7 +108,6 @@ class TestLine(unittest.TestCase):
 
         (source_1.outputs["Out"] >> plot.inputs["In1"])
 
-        comp.connect()
-        comp.run(datetime(2000, 1, 10))
+        comp.run(t_max=datetime(2000, 1, 10))
 
         pyplot.close("all")

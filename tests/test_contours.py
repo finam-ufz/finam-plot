@@ -42,7 +42,7 @@ class TestContour(unittest.TestCase):
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
-        comp.run(datetime(2000, 1, 2))
+        comp.run(t_max=datetime(2000, 1, 2))
 
         self.assertEqual(plot._info, info_1)
 
@@ -84,7 +84,7 @@ class TestContour(unittest.TestCase):
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
-        comp.run(datetime(2000, 1, 3))
+        comp.run(t_max=datetime(2000, 1, 3))
 
         self.assertEqual(plot._info, info_1)
 
@@ -130,7 +130,7 @@ class TestContour(unittest.TestCase):
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
-        comp.run(datetime(2000, 1, 10))
+        comp.run(t_max=datetime(2000, 1, 10))
 
         self.assertEqual(plot._info, info_1)
 
@@ -172,7 +172,7 @@ class TestContour(unittest.TestCase):
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
-        comp.run(datetime(2000, 1, 2))
+        comp.run(t_max=datetime(2000, 1, 2))
 
         self.assertEqual(plot._info, info_1)
 
@@ -219,7 +219,7 @@ class TestContour(unittest.TestCase):
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
-        comp.run(datetime(2000, 1, 5))
+        comp.run(t_max=datetime(2000, 1, 5))
 
         self.assertEqual(plot._info, info_1)
 
@@ -266,7 +266,7 @@ class TestContour(unittest.TestCase):
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
-        comp.run(datetime(2000, 1, 5))
+        comp.run(t_max=datetime(2000, 1, 5))
 
         self.assertEqual(plot._info, info_1)
 

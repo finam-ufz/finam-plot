@@ -94,8 +94,8 @@ class GridSpecPlot(fm.Component):
             )
         self.create_connector()
 
-    def _connect(self):
-        self.try_connect()
+    def _connect(self, start_time):
+        self.try_connect(start_time)
         for name, val in self._connector.in_infos.items():
             if val is not None:
                 self._infos[name] = val
