@@ -100,7 +100,7 @@ class XyPlot(fm.Component):
 
         self.create_connector()
 
-    def _connect(self):
+    def _connect(self, start_time):
         """Push initial values to outputs.
 
         After the method call, the component should have status CONNECTED.
@@ -111,7 +111,7 @@ class XyPlot(fm.Component):
             self._figure.tight_layout()
             self._figure.show()
 
-        self.try_connect()
+        self.try_connect(start_time)
 
         if self.status == fm.ComponentStatus.CONNECTED:
             self._infos = dict(self.connector.in_infos)

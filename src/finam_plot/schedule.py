@@ -93,7 +93,7 @@ class SchedulePlot(fm.Component):
 
         self.create_connector()
 
-    def _connect(self):
+    def _connect(self, start_time):
         """Push initial values to outputs.
 
         After the method call, the component should have status CONNECTED.
@@ -113,7 +113,7 @@ class SchedulePlot(fm.Component):
 
             self._figure.tight_layout()
 
-        self.try_connect()
+        self.try_connect(start_time)
 
     def _validate(self):
         """Validate the correctness of the component's settings and coupling.

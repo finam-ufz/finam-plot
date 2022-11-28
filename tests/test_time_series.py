@@ -36,7 +36,7 @@ class TestStepTimeSeries(unittest.TestCase):
         gen1.outputs["Out"] >> series.inputs["Gen1"]
         gen2.outputs["Out"] >> series.inputs["Gen2"]
 
-        comp.run(t_max=datetime(2000, 1, 15))
+        comp.run(end_time=datetime(2000, 1, 15))
 
         pyplot.close("all")
 
@@ -78,6 +78,6 @@ class TestPushTimeSeries(unittest.TestCase):
         gen1.outputs["Out"] >> series.inputs["Gen1"]
         gen2.outputs["Out"] >> series.inputs["Gen2"]
 
-        comp.run(t_max=datetime(2000, 1, 15))
+        comp.run(end_time=datetime(2000, 1, 15))
 
         pyplot.close("all")

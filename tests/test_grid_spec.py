@@ -48,7 +48,7 @@ class TestGridSpec(unittest.TestCase):
         source.outputs["Out1"] >> plot.inputs["In1"]
         source.outputs["Out2"] >> plot.inputs["In2"]
 
-        comp.run(datetime(2000, 1, 2))
+        comp.run(end_time=datetime(2000, 1, 2))
 
         self.assertEqual(plot._infos, {"In1": info_1, "In2": info_2})
 

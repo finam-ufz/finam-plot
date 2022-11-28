@@ -84,8 +84,8 @@ class ColorMeshPlot(fm.Component):
         )
         self.create_connector()
 
-    def _connect(self):
-        self.try_connect()
+    def _connect(self, start_time):
+        self.try_connect(start_time)
 
         in_info = self.connector.in_infos["Grid"]
         if in_info is not None:
