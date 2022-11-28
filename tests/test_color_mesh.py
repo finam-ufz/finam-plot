@@ -53,7 +53,7 @@ class TestColorMesh(unittest.TestCase):
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
-        comp.run(t_max=datetime(2000, 1, 5))
+        comp.run(end_time=datetime(2000, 1, 5))
 
         self.assertEqual(plot._info, info_1)
 
