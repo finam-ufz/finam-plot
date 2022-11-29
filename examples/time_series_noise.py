@@ -44,7 +44,7 @@ if __name__ == "__main__":
     trigger_1.outputs["Out"] >> plot.inputs["In1"]
     trigger_2.outputs["Out"] >> plot.inputs["In2"]
 
-    comp.run(datetime(2001, 1, 1))
+    comp.run(end_time=datetime(2001, 1, 1))
 
     plt.ion()
     plt.show(block=True)

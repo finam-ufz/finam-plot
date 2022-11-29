@@ -47,7 +47,7 @@ if __name__ == "__main__":
     trigger.outputs["Out"] >> plot.inputs["Grid"]
     trigger.outputs["Out"] >> plot_2.inputs["Grid"]
 
-    comp.run(datetime(2001, 1, 1))
+    comp.run(end_time=datetime(2001, 1, 1))
 
     plt.ion()
     plt.show(block=True)

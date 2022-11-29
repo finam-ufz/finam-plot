@@ -27,11 +27,11 @@ if __name__ == "__main__":
     source = fm.modules.CallbackGenerator(
         callbacks={
             "Out1": (
-                lambda t: grid_1,
+                lambda t: grid_1.copy(),
                 info_1,
             ),
             "Out2": (
-                lambda t: grid_2,
+                lambda t: grid_2.copy(),
                 info_2,
             ),
         },
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     source.outputs["Out1"] >> plot.inputs["In1"]
     source.outputs["Out2"] >> plot.inputs["In2"]
 
-    comp.run(datetime(2000, 1, 2))
+    comp.run(end_time=datetime(2000, 1, 2))
 
     plt.ion()
     plt.show(block=True)
