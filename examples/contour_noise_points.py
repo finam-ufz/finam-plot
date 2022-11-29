@@ -29,7 +29,7 @@ if __name__ == "__main__":
     source.outputs["Noise"] >> trigger.inputs["In"]
     trigger.outputs["Out"] >> plot.inputs["Grid"]
 
-    comp.run(datetime(2001, 1, 1))
+    comp.run(end_time=datetime(2001, 1, 1))
 
     plt.ion()
     plt.show(block=True)

@@ -27,7 +27,7 @@ class TestContour(unittest.TestCase):
         source = fm.modules.CallbackGenerator(
             callbacks={
                 "Out": (
-                    lambda t: grid,
+                    lambda t: grid.copy(),
                     info_1,
                 )
             },
@@ -69,7 +69,7 @@ class TestContour(unittest.TestCase):
         source = fm.modules.CallbackGenerator(
             callbacks={
                 "Out": (
-                    lambda t: grid,
+                    lambda t: grid.copy(),
                     info_1,
                 )
             },
@@ -115,7 +115,7 @@ class TestContour(unittest.TestCase):
         source = fm.modules.CallbackGenerator(
             callbacks={
                 "Out": (
-                    lambda t: generate_data(grid),
+                    lambda t: generate_data(grid).copy(),
                     info_1,
                 )
             },
@@ -157,7 +157,7 @@ class TestContour(unittest.TestCase):
         source = fm.modules.CallbackGenerator(
             callbacks={
                 "Out": (
-                    lambda t: grid,
+                    lambda t: grid.copy(),
                     info_1,
                 )
             },
@@ -204,7 +204,7 @@ class TestContour(unittest.TestCase):
         source = fm.modules.CallbackGenerator(
             callbacks={
                 "Out": (
-                    lambda t: generate_data(grid),
+                    lambda t: generate_data(grid).copy(),
                     info_1,
                 )
             },
@@ -251,7 +251,7 @@ class TestContour(unittest.TestCase):
         source = fm.modules.CallbackGenerator(
             callbacks={
                 "Out": (
-                    lambda t: generate_data(grid),
+                    lambda t: generate_data(grid).copy(),
                     info_1,
                 )
             },

@@ -45,7 +45,7 @@ if __name__ == "__main__":
     source_2.outputs["Out"] >> plot.inputs["5d"]
     source_3.outputs["Out"] >> plot.inputs["30d"]
 
-    comp.run(datetime(2001, 1, 1))
+    comp.run(end_time=datetime(2001, 1, 1))
 
     plt.ion()
     plt.show(block=True)

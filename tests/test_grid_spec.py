@@ -28,11 +28,11 @@ class TestGridSpec(unittest.TestCase):
         source = fm.modules.CallbackGenerator(
             callbacks={
                 "Out1": (
-                    lambda t: grid_1,
+                    lambda t: grid_1.copy(),
                     info_1,
                 ),
                 "Out2": (
-                    lambda t: grid_2,
+                    lambda t: grid_2.copy(),
                     info_2,
                 ),
             },
