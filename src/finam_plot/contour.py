@@ -71,6 +71,8 @@ class ContourPlot(fm.Component):
     size : tuple(number, number), optional
         Figure size. ``int`` is interpreted as pixels,
         ``float`` is interpreted as fraction of screen size.
+    update_interval : int, optional
+         Redraw interval, in number of push steps.
     **plot_kwargs
         Keyword arguments passed to plot function. See the list of functions above.
     """
@@ -83,6 +85,7 @@ class ContourPlot(fm.Component):
         triangulate=False,
         pos=None,
         size=None,
+        update_interval=1,
         **plot_kwargs,
     ):
         super().__init__()
@@ -98,6 +101,8 @@ class ContourPlot(fm.Component):
         self.triangulation = None
         self._title = title
         self._bounds = (pos, size)
+        self._update_interval = update_interval
+        self._update_counter = 0
         self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
@@ -123,16 +128,16 @@ class ContourPlot(fm.Component):
         pass
 
     def _update(self):
-        self._plot()
+        pass
 
     def _finalize(self):
         pass
 
     def _plot(self):
         try:
-            data = fm.data.get_magnitude(
-                fm.data.strip_time(self._inputs["Grid"].pull_data(self._time))
-            )
+            data = fm.data.get_magnitude(self._inputs["Grid"].pull_data(self._time))[
+                0, ...
+            ]
         except fm.FinamNoDataError as e:
             if self.status in (
                 fm.ComponentStatus.VALIDATED,
@@ -149,7 +154,7 @@ class ContourPlot(fm.Component):
             self._plot_ax.set_aspect("equal")
             self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
 
-            self._figure.canvas.manager.set_window_title(self._title)
+            self._figure.canvas.manager.set_window_title(self._title or "FINAM")
             self._plot_ax.set_title(self._title)
             self._figure.show()
         else:
@@ -275,7 +280,7 @@ class ContourPlot(fm.Component):
                 raise ValueError("Time must be of type datetime")
 
         self._time = time
-        if self.status in (fm.ComponentStatus.UPDATED, fm.ComponentStatus.VALIDATED):
-            self._update()
-        else:
+
+        if self._update_counter % self._update_interval == 0:
             self._plot()
+        self._update_counter += 1

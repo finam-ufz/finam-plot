@@ -59,12 +59,21 @@ class XyPlot(fm.Component):
     size : tuple(number, number), optional
         Figure size. ``int`` is interpreted as pixels,
         ``float`` is interpreted as fraction of screen size.
+    update_interval : int, optional
+         Redraw interval (independent of data retrieval).
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.plot`.
     """
 
     def __init__(
-        self, inputs, title=None, colors=None, pos=None, size=None, **plot_kwargs
+        self,
+        inputs,
+        title=None,
+        colors=None,
+        pos=None,
+        size=None,
+        update_interval=1,
+        **plot_kwargs,
     ):
         super().__init__()
         self._time = None
@@ -78,6 +87,8 @@ class XyPlot(fm.Component):
         self._input_names = inputs
         self._title = title
         self._bounds = (pos, size)
+        self._update_interval = update_interval
+        self._update_counter = 0
         self._plot_kwargs = plot_kwargs
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
@@ -133,20 +144,21 @@ class XyPlot(fm.Component):
         time : datetime.datetime
             simulation time to get the data for.
         """
+        if self._time != time:
+            if self._update_counter % self._update_interval == 0:
+                self._repaint()
+            self._update_counter += 1
+
         self._caller = caller
         self._time = time
 
-        if self.status in (fm.ComponentStatus.UPDATED, fm.ComponentStatus.VALIDATED):
-            self.update()
-        else:
-            self._update_plot()
+        self._update_plot()
 
     def _update(self):
         """Update the component by one time step and push new values to outputs.
 
         After the method call, the component should have status UPDATED or FINISHED.
         """
-        self._update_plot()
 
     def _update_plot(self):
         if self._lines is None:
@@ -171,10 +183,11 @@ class XyPlot(fm.Component):
                 self._lines[i].set_xdata(x)
                 self._lines[i].set_ydata(y)
 
+    def _repaint(self):
         self._axes.relim()
         self._axes.autoscale_view(True, True, True)
 
-        self._figure.canvas.draw()
+        self._figure.canvas.draw_idle()
         self._figure.canvas.flush_events()
 
     def _finalize(self):
@@ -184,7 +197,7 @@ class XyPlot(fm.Component):
         """
 
     def _extract_data(self, grid, data):
-        raw = fm.data.get_magnitude(fm.data.strip_time(data))
+        raw = fm.data.get_magnitude(data)[0, ...]
         if isinstance(grid, fm.NoGrid):
             if grid.dim == 1:
                 return list(range(raw.shape[0])), raw

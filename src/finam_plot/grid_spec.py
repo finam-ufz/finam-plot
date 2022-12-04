@@ -110,7 +110,7 @@ class GridSpecPlot(fm.Component):
         self._figure, axes = create_figure(self._bounds)
         axes.set_aspect("equal")
 
-        self._figure.canvas.manager.set_window_title(self._title)
+        self._figure.canvas.manager.set_window_title(self._title or "FINAM")
         axes.set_title(self._title)
 
         for i, name in enumerate(self._infos):

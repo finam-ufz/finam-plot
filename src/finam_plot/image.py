@@ -54,11 +54,21 @@ class ImagePlot(fm.Component):
     size : tuple(number, number), optional
         Figure size. ``int`` is interpreted as pixels,
         ``float`` is interpreted as fraction of screen size.
+    update_interval : int, optional
+         Redraw interval, in number of push steps.
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.imshow`.
     """
 
-    def __init__(self, title=None, axes=(0, 1), pos=None, size=None, **plot_kwargs):
+    def __init__(
+        self,
+        title=None,
+        axes=(0, 1),
+        pos=None,
+        size=None,
+        update_interval=1,
+        **plot_kwargs,
+    ):
         super().__init__()
         self._time = None
         self._figure = None
@@ -70,6 +80,8 @@ class ImagePlot(fm.Component):
         self._title = title
         self._time_text = None
         self._bounds = (pos, size)
+        self._update_interval = update_interval
+        self._update_counter = 0
         self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
@@ -103,16 +115,16 @@ class ImagePlot(fm.Component):
         pass
 
     def _update(self):
-        self._plot()
+        pass
 
     def _finalize(self):
         pass
 
     def _plot(self):
         try:
-            data = fm.data.get_magnitude(
-                fm.data.strip_time(self._inputs["Grid"].pull_data(self._time))
-            )
+            data = fm.data.get_magnitude(self._inputs["Grid"].pull_data(self._time))[
+                0, ...
+            ]
         except fm.FinamNoDataError as e:
             if self.status in (
                 fm.ComponentStatus.VALIDATED,
@@ -136,7 +148,7 @@ class ImagePlot(fm.Component):
 
             self._plot_ax.set_aspect("equal")
 
-            self._figure.canvas.manager.set_window_title(self._title)
+            self._figure.canvas.manager.set_window_title(self._title or "FINAM")
             self._plot_ax.set_title(self._title)
 
             g = self._info.grid
@@ -200,7 +212,7 @@ class ImagePlot(fm.Component):
                 raise ValueError("Time must be of type datetime")
 
         self._time = time
-        if self.status in (fm.ComponentStatus.UPDATED, fm.ComponentStatus.VALIDATED):
-            self._update()
-        else:
+
+        if self._update_counter % self._update_interval == 0:
             self._plot()
+        self._update_counter += 1
