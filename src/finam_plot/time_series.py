@@ -5,10 +5,11 @@ import finam as fm
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
+from .plot import PlotBase
 from .tools import create_figure
 
 
-class TimeSeriesPlot(fm.Component):
+class TimeSeriesPlot(PlotBase):
     """Line plot for multiple time series, push-based.
 
     Expects all inputs to be scalar values.
@@ -75,12 +76,10 @@ class TimeSeriesPlot(fm.Component):
         update_interval=1,
         **plot_kwargs,
     ):
-        super().__init__()
+        super().__init__(title, pos, size, update_interval, **plot_kwargs)
         self._time = None
         self._caller = None
 
-        self._figure = None
-        self._axes = None
         self._data = [[] for _ in inputs]
         self._x = [[] for _ in inputs]
         self._lines = None
@@ -88,11 +87,6 @@ class TimeSeriesPlot(fm.Component):
         self._input_units = (
             inputs if isinstance(inputs, dict) else {n: None for n in inputs}
         )
-        self._title = title
-        self._bounds = (pos, size)
-        self._update_interval = update_interval
-        self._update_counter = 0
-        self._plot_kwargs = plot_kwargs
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
     def _initialize(self):
@@ -119,18 +113,15 @@ class TimeSeriesPlot(fm.Component):
 
         After the method call, the component should have status CONNECTED.
         """
-        if self._figure is None:
+        if self.figure is None:
             with plt.style.context("fast"):
-                self._figure, self._axes = create_figure(self._bounds)
+                self.create_figure()
 
-                self._figure.canvas.manager.set_window_title(self._title or "FINAM")
-                self._axes.set_title(self._title)
+                date_format = mdates.AutoDateFormatter(self.axes.xaxis)
+                self.axes.xaxis.set_major_formatter(date_format)
+                self.axes.tick_params(axis="x", labelrotation=20)
 
-                date_format = mdates.AutoDateFormatter(self._axes.xaxis)
-                self._axes.xaxis.set_major_formatter(date_format)
-                self._axes.tick_params(axis="x", labelrotation=20)
-
-                self._figure.tight_layout()
+                self.figure.tight_layout()
 
         self.try_connect(start_time)
 
@@ -141,7 +132,7 @@ class TimeSeriesPlot(fm.Component):
         """
         self._caller = None
         self._update_plot()
-        self._figure.show()
+        self.figure.show()
 
     def _data_changed(self, caller, time):
         """Update for changed data.
@@ -154,21 +145,14 @@ class TimeSeriesPlot(fm.Component):
             simulation time to get the data for.
         """
         if self._time != time:
-            if self._update_counter % self._update_interval == 0:
-                self._repaint()
-            self._update_counter += 1
+            if self.should_repaint():
+                self.repaint(relim=True)
 
         self._caller = caller
         self._time = time
 
         if self.status in (fm.ComponentStatus.UPDATED, fm.ComponentStatus.VALIDATED):
             self._update_plot()
-
-    def _update(self):
-        """Update the component by one time step and push new values to outputs.
-
-        After the method call, the component should have status UPDATED or FINISHED.
-        """
 
     def _update_plot(self):
         with plt.style.context("fast"):
@@ -178,15 +162,15 @@ class TimeSeriesPlot(fm.Component):
                     units = self.inputs[n].info.meta.get("units")
                     units = f" [{units}]" if units else ""
                     self._lines.append(
-                        self._axes.plot(
+                        self.axes.plot(
                             [],
                             [],
                             label=n + units,
                             c=self._colors[i % len(self._colors)],
-                            **self._plot_kwargs,
+                            **self.plot_kwargs,
                         )[0]
                     )
-                self._axes.legend(loc=1)
+                self.axes.legend(loc=1)
 
             for i, inp in enumerate(self._input_units):
                 if self._caller is None or self.inputs[inp] == self._caller:
@@ -200,19 +184,12 @@ class TimeSeriesPlot(fm.Component):
                     self._lines[i].set_xdata(self._x[i])
                     self._lines[i].set_ydata(self._data[i])
 
-    def _repaint(self):
-        self._axes.relim()
-        self._axes.autoscale_view(True, True, True)
-
-        self._figure.canvas.draw_idle()
-        self._figure.canvas.flush_events()
-
     def _finalize(self):
         """Finalize and clean up the component.
 
         After the method call, the component should have status FINALIZED.
         """
-        self._repaint()
+        self.repaint(relim=True)
 
 
 class StepTimeSeriesPlot(fm.TimeComponent):

@@ -30,12 +30,22 @@ Point and line plots
     TimeSeriesPlot
     XyPlot
 
+Base classes
+============
+
+.. autosummary::
+   :toctree: generated
+   :caption: Base classes
+
+    PlotBase
+
 """
 from . import tools
 from .colormesh import ColorMeshPlot
 from .contour import ContourPlot
 from .grid_spec import GridSpecPlot
 from .image import ImagePlot
+from .plot import PlotBase
 from .schedule import SchedulePlot
 from .time_series import StepTimeSeriesPlot, TimeSeriesPlot
 from .xy import XyPlot
@@ -55,4 +65,5 @@ __all__ = [
     "SchedulePlot",
     "StepTimeSeriesPlot",
     "TimeSeriesPlot",
+    "PlotBase",
 ]

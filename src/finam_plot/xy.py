@@ -2,10 +2,10 @@
 import finam as fm
 import matplotlib.pyplot as plt
 
-from .tools import create_figure
+from .plot import PlotBase
 
 
-class XyPlot(fm.Component):
+class XyPlot(PlotBase):
     """Line and scatter plots for multiple instant series, push-based.
 
     Inputs are expected to be one of:
@@ -75,21 +75,14 @@ class XyPlot(fm.Component):
         update_interval=1,
         **plot_kwargs,
     ):
-        super().__init__()
+        super().__init__(title, pos, size, update_interval, **plot_kwargs)
         self._time = None
         self._caller = None
 
-        self._figure = None
-        self._axes = None
         self._lines = None
         self._infos = None
 
         self._input_names = inputs
-        self._title = title
-        self._bounds = (pos, size)
-        self._update_interval = update_interval
-        self._update_counter = 0
-        self._plot_kwargs = plot_kwargs
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
     def _initialize(self):
@@ -116,11 +109,11 @@ class XyPlot(fm.Component):
 
         After the method call, the component should have status CONNECTED.
         """
-        if self._figure is None:
-            self._figure, self._axes = create_figure(self._bounds)
+        if self.figure is None:
+            self.create_figure()
 
-            self._figure.tight_layout()
-            self._figure.show()
+            self.figure.tight_layout()
+            self.figure.show()
 
         self.try_connect(start_time)
 
@@ -145,34 +138,27 @@ class XyPlot(fm.Component):
             simulation time to get the data for.
         """
         if self._time != time:
-            if self._update_counter % self._update_interval == 0:
-                self._repaint()
-            self._update_counter += 1
+            if self.should_repaint():
+                self.repaint(relim=True)
 
         self._caller = caller
         self._time = time
 
         self._update_plot()
 
-    def _update(self):
-        """Update the component by one time step and push new values to outputs.
-
-        After the method call, the component should have status UPDATED or FINISHED.
-        """
-
     def _update_plot(self):
         if self._lines is None:
             self._lines = [
-                self._axes.plot(
+                self.axes.plot(
                     [],
                     [],
                     label=n,
                     c=self._colors[i % len(self._colors)],
-                    **self._plot_kwargs,
+                    **self.plot_kwargs,
                 )[0]
                 for i, n in enumerate(self._input_names)
             ]
-            self._axes.legend(loc=1)
+            self.axes.legend(loc=1)
 
         for i, inp in enumerate(self._input_names):
             if self.inputs[inp] == self._caller:
@@ -182,19 +168,6 @@ class XyPlot(fm.Component):
 
                 self._lines[i].set_xdata(x)
                 self._lines[i].set_ydata(y)
-
-    def _repaint(self):
-        self._axes.relim()
-        self._axes.autoscale_view(True, True, True)
-
-        self._figure.canvas.draw_idle()
-        self._figure.canvas.flush_events()
-
-    def _finalize(self):
-        """Finalize and clean up the component.
-
-        After the method call, the component should have status FINALIZED.
-        """
 
     def _extract_data(self, grid, data):
         raw = fm.data.get_magnitude(data)[0, ...]
@@ -209,3 +182,10 @@ class XyPlot(fm.Component):
 
         with fm.tools.ErrorLogger(self.logger):
             raise ValueError(f"Grid type {grid.__class__.__name__} not supported.")
+
+    def _finalize(self):
+        """Finalize and clean up the component.
+
+        After the method call, the component should have status FINALIZED.
+        """
+        self.repaint(relim=True)

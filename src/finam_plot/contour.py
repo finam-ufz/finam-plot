@@ -5,10 +5,11 @@ import finam as fm
 import numpy as np
 from matplotlib.tri import Triangulation
 
-from .tools import create_colorbar, create_figure
+from .plot import PlotBase
+from .tools import create_colorbar
 
 
-class ContourPlot(fm.Component):
+class ContourPlot(PlotBase):
     """Contour plot component for structured and unstructured grids
 
     Data must be of grid and FINAM grid type.
@@ -88,22 +89,15 @@ class ContourPlot(fm.Component):
         update_interval=1,
         **plot_kwargs,
     ):
-        super().__init__()
+        super().__init__(title, pos, size, update_interval, **plot_kwargs)
         self._time = None
-        self._figure = None
-        self._plot_ax = None
-        self._axes = axes
+        self._axes_order = axes
         self._triangulate = triangulate
         self._fill = fill
         self._info = None
         self._contours = None
         self._time_text = None
         self.triangulation = None
-        self._title = title
-        self._bounds = (pos, size)
-        self._update_interval = update_interval
-        self._update_counter = 0
-        self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
         self.inputs.add(
@@ -124,18 +118,9 @@ class ContourPlot(fm.Component):
         if in_info is not None:
             self._info = in_info
 
-    def _validate(self):
-        pass
-
-    def _update(self):
-        pass
-
-    def _finalize(self):
-        pass
-
     def _plot(self):
         try:
-            data = fm.data.get_magnitude(self._inputs["Grid"].pull_data(self._time))[
+            data = fm.data.get_magnitude(self.inputs["Grid"].pull_data(self._time))[
                 0, ...
             ]
         except fm.FinamNoDataError as e:
@@ -148,27 +133,28 @@ class ContourPlot(fm.Component):
             with fm.tools.ErrorLogger(self.logger):
                 raise e
 
-        if self._figure is None:
-            self._figure, self._plot_ax = create_figure(self._bounds)
+        if not self.should_repaint():
+            return
 
-            self._plot_ax.set_aspect("equal")
-            self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
+        if self.figure is None:
+            self.create_figure()
 
-            self._figure.canvas.manager.set_window_title(self._title or "FINAM")
-            self._plot_ax.set_title(self._title)
-            self._figure.show()
+            self.axes.set_aspect("equal")
+            self._time_text = self.figure.text(0.5, 0.01, self._time, ha="center")
+            self.figure.show()
         else:
             self._time_text.set_text(self._time)
 
         first_plot = True
         if self._contours is not None:
-            self._plot_ax.clear()
-            self._plot_ax.set_title(self._title)
+            self.axes.clear()
+            self.axes.set_title(self._title)
             first_plot = False
 
         axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
         axes_indices = [
-            ax if isinstance(ax, int) else axes_names[ax] for ax in list(self._axes)
+            ax if isinstance(ax, int) else axes_names[ax]
+            for ax in list(self._axes_order)
         ]
 
         ax_1 = axes_indices[0]
@@ -180,11 +166,10 @@ class ContourPlot(fm.Component):
             self._plot_structured(data, (ax_1, ax_2))
 
         if first_plot:
-            create_colorbar(self._figure, self._plot_ax, self._contours)
-            self._figure.tight_layout()
+            create_colorbar(self.figure, self.axes, self._contours)
+            self.figure.tight_layout()
 
-        self._figure.canvas.draw()
-        self._figure.canvas.flush_events()
+        self.repaint(relim=False)
 
     def _plot_structured(self, data, axes):
         if axes == (0, 1):
@@ -197,13 +182,9 @@ class ContourPlot(fm.Component):
         data_axes = [self._info.grid.data_axes[i] for i in axes]
 
         if self._fill:
-            self._contours = self._plot_ax.contourf(
-                *data_axes, data, **self._plot_kwargs
-            )
+            self._contours = self.axes.contourf(*data_axes, data, **self.plot_kwargs)
         else:
-            self._contours = self._plot_ax.contour(
-                *data_axes, data, **self._plot_kwargs
-            )
+            self._contours = self.axes.contour(*data_axes, data, **self.plot_kwargs)
 
     def _plot_unstructured(self, data, axes):
         if self._info.grid.data_location == fm.Location.POINTS:
@@ -232,12 +213,12 @@ class ContourPlot(fm.Component):
                 data.reshape(-1, order=self._info.grid.order)
             )
             if self._fill:
-                self._contours = self._plot_ax.tricontourf(
-                    *self.triangulation, data_flat, **self._plot_kwargs
+                self._contours = self.axes.tricontourf(
+                    *self.triangulation, data_flat, **self.plot_kwargs
                 )
             else:
-                self._contours = self._plot_ax.tricontour(
-                    *self.triangulation, data_flat, **self._plot_kwargs
+                self._contours = self.axes.tricontour(
+                    *self.triangulation, data_flat, **self.plot_kwargs
                 )
         else:
             if self._fill:
@@ -255,11 +236,11 @@ class ContourPlot(fm.Component):
                     data.reshape(-1, order=self._info.grid.order)
                 )
 
-                self._contours = self._plot_ax.tripcolor(
+                self._contours = self.axes.tripcolor(
                     *self._info.grid.points.T[list(axes)],
                     data_flat,
                     triangles=self._info.grid.cells,
-                    **self._plot_kwargs,
+                    **self.plot_kwargs,
                 )
             else:
                 if self.triangulation is None:
@@ -270,8 +251,8 @@ class ContourPlot(fm.Component):
                 data_flat = np.ascontiguousarray(
                     data.reshape(-1, order=self._info.grid.order)
                 )
-                self._contours = self._plot_ax.tricontour(
-                    *self.triangulation, data_flat, **self._plot_kwargs
+                self._contours = self.axes.tricontour(
+                    *self.triangulation, data_flat, **self.plot_kwargs
                 )
 
     def _data_changed(self, _caller, time):
@@ -281,6 +262,4 @@ class ContourPlot(fm.Component):
 
         self._time = time
 
-        if self._update_counter % self._update_interval == 0:
-            self._plot()
-        self._update_counter += 1
+        self._plot()
