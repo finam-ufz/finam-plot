@@ -109,16 +109,17 @@ class TimeSeriesPlot(fm.Component):
         After the method call, the component should have status CONNECTED.
         """
         if self._figure is None:
-            self._figure, self._axes = create_figure(self._bounds)
+            with plt.style.context("fast"):
+                self._figure, self._axes = create_figure(self._bounds)
 
-            self._figure.canvas.manager.set_window_title(self._title)
-            self._axes.set_title(self._title)
+                self._figure.canvas.manager.set_window_title(self._title or "FINAM")
+                self._axes.set_title(self._title)
 
-            date_format = mdates.AutoDateFormatter(self._axes.xaxis)
-            self._axes.xaxis.set_major_formatter(date_format)
-            self._axes.tick_params(axis="x", labelrotation=20)
+                date_format = mdates.AutoDateFormatter(self._axes.xaxis)
+                self._axes.xaxis.set_major_formatter(date_format)
+                self._axes.tick_params(axis="x", labelrotation=20)
 
-            self._figure.tight_layout()
+                self._figure.tight_layout()
 
         self.try_connect(start_time)
 
@@ -141,52 +142,56 @@ class TimeSeriesPlot(fm.Component):
         time : datetime
             simulation time to get the data for.
         """
+        if self._time != time:
+            self._repaint()
+
         self._caller = caller
         self._time = time
 
         if self.status in (fm.ComponentStatus.UPDATED, fm.ComponentStatus.VALIDATED):
-            self.update()
+            self._update_plot()
 
     def _update(self):
         """Update the component by one time step and push new values to outputs.
 
         After the method call, the component should have status UPDATED or FINISHED.
         """
-        self._update_plot()
 
     def _update_plot(self):
-        if self._lines is None:
-            self._lines = []
-            for i, n in enumerate(self._input_units):
-                units = self.inputs[n].info.meta.get("units")
-                units = f" [{units}]" if units else ""
-                self._lines.append(
-                    self._axes.plot(
-                        [],
-                        [],
-                        label=n + units,
-                        c=self._colors[i % len(self._colors)],
-                        **self._plot_kwargs,
-                    )[0]
-                )
-            self._axes.legend(loc=1)
+        with plt.style.context("fast"):
+            if self._lines is None:
+                self._lines = []
+                for i, n in enumerate(self._input_units):
+                    units = self.inputs[n].info.meta.get("units")
+                    units = f" [{units}]" if units else ""
+                    self._lines.append(
+                        self._axes.plot(
+                            [],
+                            [],
+                            label=n + units,
+                            c=self._colors[i % len(self._colors)],
+                            **self._plot_kwargs,
+                        )[0]
+                    )
+                self._axes.legend(loc=1)
 
-        for i, inp in enumerate(self._input_units):
-            if self._caller is None or self.inputs[inp] == self._caller:
-                value = fm.data.get_magnitude(
-                    fm.data.strip_time(self.inputs[inp].pull_data(self._time))
-                )
+            for i, inp in enumerate(self._input_units):
+                if self._caller is None or self.inputs[inp] == self._caller:
+                    value = fm.data.get_magnitude(
+                        self.inputs[inp].pull_data(self._time)
+                    )
 
-                self._x[i].append(self._time)
-                self._data[i].append(value)
+                    self._x[i].append(self._time)
+                    self._data[i].append(value.item())
 
-                self._lines[i].set_xdata(self._x[i])
-                self._lines[i].set_ydata(self._data[i])
+                    self._lines[i].set_xdata(self._x[i])
+                    self._lines[i].set_ydata(self._data[i])
 
+    def _repaint(self):
         self._axes.relim()
         self._axes.autoscale_view(True, True, True)
 
-        self._figure.canvas.draw()
+        self._figure.canvas.draw_idle()
         self._figure.canvas.flush_events()
 
     def _finalize(self):
@@ -194,6 +199,7 @@ class TimeSeriesPlot(fm.Component):
 
         After the method call, the component should have status FINALIZED.
         """
+        self._repaint()
 
 
 class StepTimeSeriesPlot(fm.TimeComponent):
@@ -330,16 +336,17 @@ class StepTimeSeriesPlot(fm.TimeComponent):
 
         After the method call, the component should have status VALIDATED.
         """
-        self._figure, self._axes = create_figure(self._bounds)
+        with plt.style.context("fast"):
+            self._figure, self._axes = create_figure(self._bounds)
 
-        self._figure.canvas.manager.set_window_title(self._title)
-        self._axes.set_title(self._title)
+            self._figure.canvas.manager.set_window_title(self._title or "FINAM")
+            self._axes.set_title(self._title)
 
-        date_format = mdates.AutoDateFormatter(self._axes.xaxis)
-        self._axes.xaxis.set_major_formatter(date_format)
-        self._axes.tick_params(axis="x", labelrotation=20)
+            date_format = mdates.AutoDateFormatter(self._axes.xaxis)
+            self._axes.xaxis.set_major_formatter(date_format)
+            self._axes.tick_params(axis="x", labelrotation=20)
 
-        self._figure.show()
+            self._figure.show()
 
     def _update(self):
         """Update the component by one time step.
@@ -349,41 +356,40 @@ class StepTimeSeriesPlot(fm.TimeComponent):
         """
         self._time += self._step
 
-        if self._lines is None:
-            self._lines = []
-            for i, n in enumerate(self._input_units):
-                units = self.inputs[n].info.meta.get("units")
-                units = f" [{units}]" if units else ""
-                self._lines.append(
-                    self._axes.plot(
-                        [],
-                        [],
-                        label=n + units,
-                        c=self._colors[i % len(self._colors)],
-                        **self._plot_kwargs,
-                    )[0]
-                )
-            self._axes.legend(loc=1)
+        with plt.style.context("fast"):
+            if self._lines is None:
+                self._lines = []
+                for i, n in enumerate(self._input_units):
+                    units = self.inputs[n].info.meta.get("units")
+                    units = f" [{units}]" if units else ""
+                    self._lines.append(
+                        self._axes.plot(
+                            [],
+                            [],
+                            label=n + units,
+                            c=self._colors[i % len(self._colors)],
+                            **self._plot_kwargs,
+                        )[0]
+                    )
+                self._axes.legend(loc=1)
 
-        for i, inp in enumerate(self._input_units):
-            if self._updates % self._intervals[i] == 0:
-                value = fm.data.get_magnitude(
-                    fm.data.strip_time(self.inputs[inp].pull_data(self.time))
-                )
+            for i, inp in enumerate(self._input_units):
+                if self._updates % self._intervals[i] == 0:
+                    value = fm.data.get_magnitude(self.inputs[inp].pull_data(self.time))
 
-                self._x[i].append(self.time)
-                self._data[i].append(value)
+                    self._x[i].append(self.time)
+                    self._data[i].append(value.item())
 
-        if self._updates % self._update_interval == 0:
-            for i, line in enumerate(self._lines):
-                line.set_xdata(self._x[i])
-                line.set_ydata(self._data[i])
+            if self._updates % self._update_interval == 0:
+                for i, line in enumerate(self._lines):
+                    line.set_xdata(self._x[i])
+                    line.set_ydata(self._data[i])
 
-            self._axes.relim()
-            self._axes.autoscale_view(True, True, True)
+                self._axes.relim()
+                self._axes.autoscale_view(True, True, True)
 
-            self._figure.canvas.draw()
-            self._figure.canvas.flush_events()
+                self._figure.canvas.draw_idle()
+                self._figure.canvas.flush_events()
 
         self._updates += 1
 
