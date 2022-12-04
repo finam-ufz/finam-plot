@@ -5,10 +5,10 @@ import finam as fm
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 
-from .tools import create_figure
+from .plot import PlotBase
 
 
-class SchedulePlot(fm.Component):
+class SchedulePlot(PlotBase):
     """Live visualization of module update schedule.
 
     Takes inputs of arbitrary types and simply plots the time of notifications of each input.
@@ -58,27 +58,32 @@ class SchedulePlot(fm.Component):
     size : tuple(number, number), optional
         Figure size. ``int`` is interpreted as pixels,
         ``float`` is interpreted as fraction of screen size.
+    update_interval : int, optional
+         Redraw interval (independent of data retrieval).
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.plot`.
     """
 
     def __init__(
-        self, inputs, title=None, colors=None, pos=None, size=None, **plot_kwargs
+        self,
+        inputs,
+        title=None,
+        colors=None,
+        pos=None,
+        size=None,
+        update_interval=1,
+        **plot_kwargs,
     ):
-        super().__init__()
-        self._figure = None
-        self._axes = None
+        super().__init__(title, pos, size, update_interval, **plot_kwargs)
+        self._time = None
         self._lines = None
         self._x = [[] for _ in inputs]
 
         self._input_names = inputs
-        self._title = title
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
-        self._bounds = (pos, size)
-        self._plot_kwargs = plot_kwargs
-        if "marker" not in self._plot_kwargs:
-            self._plot_kwargs["marker"] = "+"
+        if "marker" not in self.plot_kwargs:
+            self.plot_kwargs["marker"] = "+"
 
     def _initialize(self):
         """Initialize the component.
@@ -98,20 +103,17 @@ class SchedulePlot(fm.Component):
 
         After the method call, the component should have status CONNECTED.
         """
-        if self._figure is None:
-            self._figure, self._axes = create_figure(self._bounds)
+        if self.figure is None:
+            self.create_figure()
 
-            self._figure.canvas.manager.set_window_title(self._title or "FINAM")
-            self._axes.set_title(self._title)
+            date_format = mdates.AutoDateFormatter(self.axes.xaxis)
+            self.axes.xaxis.set_major_formatter(date_format)
+            self.axes.tick_params(axis="x", labelrotation=20)
+            self.axes.invert_yaxis()
+            self.axes.set_yticks(range(len(self._input_names)))
+            self.axes.set_yticklabels(self._input_names)
 
-            date_format = mdates.AutoDateFormatter(self._axes.xaxis)
-            self._axes.xaxis.set_major_formatter(date_format)
-            self._axes.tick_params(axis="x", labelrotation=20)
-            self._axes.invert_yaxis()
-            self._axes.set_yticks(range(len(self._input_names)))
-            self._axes.set_yticklabels(self._input_names)
-
-            self._figure.tight_layout()
+            self.figure.tight_layout()
 
         self.try_connect(start_time)
 
@@ -120,7 +122,7 @@ class SchedulePlot(fm.Component):
 
         After the method call, the component should have status VALIDATED.
         """
-        self._figure.show()
+        self.figure.show()
 
     def _data_changed(self, caller, time):
         """Update for changed data.
@@ -132,44 +134,40 @@ class SchedulePlot(fm.Component):
         time : datetime
             simulation time to get the data for.
         """
+        if self._time != time:
+            if self.should_repaint():
+                self.repaint(relim=True)
+
+        self._time = time
+
         self._update_plot(caller, time)
-
-    def _update(self):
-        """Update the component by one time step and push new values to outputs.
-
-        After the method call, the component should have status UPDATED or FINISHED.
-        """
 
     def _update_plot(self, caller, time):
         """Update the plot."""
         if self._lines is None:
             self._lines = [
-                self._axes.plot(
+                self.axes.plot(
                     [datetime.min],
                     i,
                     label=h,
                     c=self._colors[i % len(self._colors)],
-                    **self._plot_kwargs,
+                    **self.plot_kwargs,
                 )[0]
                 for i, h in enumerate(self._input_names)
             ]
 
         for i, inp in enumerate(self._input_names):
             if self.inputs[inp] == caller:
+                _ = self.inputs[inp].pull_data(time)
                 self._x[i].append(time)
 
         for i, line in enumerate(self._lines):
             line.set_xdata(self._x[i])
             line.set_ydata(i)
 
-        self._axes.relim()
-        self._axes.autoscale_view(True, True, True)
-
-        self._figure.canvas.draw()
-        self._figure.canvas.flush_events()
-
     def _finalize(self):
         """Finalize and clean up the component.
 
         After the method call, the component should have status FINALIZED.
         """
+        self.repaint(relim=True)

@@ -4,10 +4,11 @@ from datetime import datetime
 import finam as fm
 import numpy as np
 
-from .tools import create_colorbar, create_figure
+from .plot import PlotBase
+from .tools import create_colorbar
 
 
-class ColorMeshPlot(fm.Component):
+class ColorMeshPlot(PlotBase):
     """Raster image plot component for uniform and rectilinear grids.
 
     Data must be of grid type :class:`finam.RectilinearGrid`, :class:`finam.UniformGrid`
@@ -70,19 +71,12 @@ class ColorMeshPlot(fm.Component):
         update_interval=1,
         **plot_kwargs,
     ):
-        super().__init__()
+        super().__init__(title, pos, size, update_interval, **plot_kwargs)
         self._time = None
-        self._figure = None
-        self._plot_ax = None
-        self._axes = axes
+        self._axes_order = axes
         self._info = None
         self._mesh = None
         self._time_text = None
-        self._title = title
-        self._bounds = (pos, size)
-        self._update_interval = update_interval
-        self._update_counter = 0
-        self._plot_kwargs = plot_kwargs
 
     def _initialize(self):
         self.inputs.add(
@@ -113,18 +107,9 @@ class ColorMeshPlot(fm.Component):
                         "Only RectilinearGrid is supported in colormesh plot."
                     )
 
-    def _validate(self):
-        pass
-
-    def _update(self):
-        pass
-
-    def _finalize(self):
-        pass
-
     def _plot(self):
         try:
-            data = fm.data.get_magnitude(self._inputs["Grid"].pull_data(self._time))[
+            data = fm.data.get_magnitude(self.inputs["Grid"].pull_data(self._time))[
                 0, ...
             ]
         except fm.FinamNoDataError as e:
@@ -137,18 +122,18 @@ class ColorMeshPlot(fm.Component):
             with fm.tools.ErrorLogger(self.logger):
                 raise e
 
-        if self._figure is None:
-            self._figure, self._plot_ax = create_figure(self._bounds)
+        if self.figure is None:
+            self.create_figure()
+            self.axes.set_aspect("equal")
+            self.figure.show()
 
-            self._plot_ax.set_aspect("equal")
-
-            self._figure.canvas.manager.set_window_title(self._title or "FINAM")
-            self._plot_ax.set_title(self._title)
-            self._figure.show()
+        if not self.should_repaint():
+            return
 
         axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
         axes_indices = [
-            ax if isinstance(ax, int) else axes_names[ax] for ax in list(self._axes)
+            ax if isinstance(ax, int) else axes_names[ax]
+            for ax in list(self._axes_order)
         ]
 
         ax_1 = axes_indices[0]
@@ -156,8 +141,7 @@ class ColorMeshPlot(fm.Component):
 
         self._plot_image(data, (ax_1, ax_2))
 
-        self._figure.canvas.draw()
-        self._figure.canvas.flush_events()
+        self.repaint(relim=False)
 
     def _plot_image(self, data, axes):
         if axes == (0, 1):
@@ -175,15 +159,15 @@ class ColorMeshPlot(fm.Component):
         data_axes = [self._info.grid.axes[i] for i in axes]
 
         if self._mesh is None:
-            self._mesh = self._plot_ax.pcolormesh(
+            self._mesh = self.axes.pcolormesh(
                 data_axes[0],
                 data_axes[1],
                 data,
-                **self._plot_kwargs,
+                **self.plot_kwargs,
             )
-            self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
-            create_colorbar(self._figure, self._plot_ax, self._mesh)
-            self._figure.tight_layout()
+            self._time_text = self.figure.text(0.5, 0.01, self._time, ha="center")
+            create_colorbar(self.figure, self.axes, self._mesh)
+            self.figure.tight_layout()
         else:
             self._mesh.set_array(data.ravel())
             self._time_text.set_text(self._time)
@@ -195,6 +179,4 @@ class ColorMeshPlot(fm.Component):
 
         self._time = time
 
-        if self._update_counter % self._update_interval == 0:
-            self._plot()
-        self._update_counter += 1
+        self._plot()
