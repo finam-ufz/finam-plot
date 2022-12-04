@@ -101,7 +101,7 @@ class SchedulePlot(fm.Component):
         if self._figure is None:
             self._figure, self._axes = create_figure(self._bounds)
 
-            self._figure.canvas.manager.set_window_title(self._title)
+            self._figure.canvas.manager.set_window_title(self._title or "FINAM")
             self._axes.set_title(self._title)
 
             date_format = mdates.AutoDateFormatter(self._axes.xaxis)

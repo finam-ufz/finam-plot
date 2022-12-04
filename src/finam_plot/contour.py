@@ -149,7 +149,7 @@ class ContourPlot(fm.Component):
             self._plot_ax.set_aspect("equal")
             self._time_text = self._figure.text(0.5, 0.01, self._time, ha="center")
 
-            self._figure.canvas.manager.set_window_title(self._title)
+            self._figure.canvas.manager.set_window_title(self._title or "FINAM")
             self._plot_ax.set_title(self._title)
             self._figure.show()
         else:

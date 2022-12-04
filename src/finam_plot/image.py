@@ -136,7 +136,7 @@ class ImagePlot(fm.Component):
 
             self._plot_ax.set_aspect("equal")
 
-            self._figure.canvas.manager.set_window_title(self._title)
+            self._figure.canvas.manager.set_window_title(self._title or "FINAM")
             self._plot_ax.set_title(self._title)
 
             g = self._info.grid
