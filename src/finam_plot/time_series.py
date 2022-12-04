@@ -59,12 +59,21 @@ class TimeSeriesPlot(fm.Component):
     size : tuple(number, number), optional
         Figure size. ``int`` is interpreted as pixels,
         ``float`` is interpreted as fraction of screen size.
+    update_interval : int, optional
+         Redraw interval (independent of data retrieval).
     **plot_kwargs
         Keyword arguments passed to plot function. See :func:`matplotlib.pyplot.plot`.
     """
 
     def __init__(
-        self, inputs, title=None, colors=None, pos=None, size=None, **plot_kwargs
+        self,
+        inputs,
+        title=None,
+        colors=None,
+        pos=None,
+        size=None,
+        update_interval=1,
+        **plot_kwargs,
     ):
         super().__init__()
         self._time = None
@@ -81,6 +90,8 @@ class TimeSeriesPlot(fm.Component):
         )
         self._title = title
         self._bounds = (pos, size)
+        self._update_interval = update_interval
+        self._update_counter = 0
         self._plot_kwargs = plot_kwargs
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
 
@@ -143,7 +154,9 @@ class TimeSeriesPlot(fm.Component):
             simulation time to get the data for.
         """
         if self._time != time:
-            self._repaint()
+            if self._update_counter % self._update_interval == 0:
+                self._repaint()
+            self._update_counter += 1
 
         self._caller = caller
         self._time = time
