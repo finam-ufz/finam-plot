@@ -397,17 +397,20 @@ class StepTimeSeriesPlot(fm.TimeComponent):
                 for i, line in enumerate(self._lines):
                     line.set_xdata(self._x[i])
                     line.set_ydata(self._data[i])
-
-                self._axes.relim()
-                self._axes.autoscale_view(True, True, True)
-
-                self._figure.canvas.draw_idle()
-                self._figure.canvas.flush_events()
+                self._repaint()
 
         self._updates += 1
+
+    def _repaint(self):
+        self._axes.relim()
+        self._axes.autoscale_view(True, True, True)
+
+        self._figure.canvas.draw_idle()
+        self._figure.canvas.flush_events()
 
     def _finalize(self):
         """Finalize and clean up the component.
 
         After the method call, the component should have status FINALIZED.
         """
+        self._repaint()
