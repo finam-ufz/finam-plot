@@ -7,7 +7,7 @@ from finam_plot import SchedulePlot
 
 
 def transform(inputs, _time):
-    return {"Out": fm.data.strip_data(inputs["In"]) * 2.0}
+    return {"Out": inputs["In"][0, ...] * 2.0}
 
 
 if __name__ == "__main__":
