@@ -35,8 +35,7 @@ class ColorMeshPlot(PlotBase):
         import finam_plot as fmp
 
         plot = fmp.ColorMeshPlot(
-            axes=(0, 1),
-            vmin=0, vmax=1, cmap="hsv", # plot kwargs
+            vmin=0, vmax=1, cmap="hsv", # plot_kwargs
         )
 
     .. testcode:: constructor
@@ -48,8 +47,6 @@ class ColorMeshPlot(PlotBase):
     ----------
     title : str, optional
         Title for plot and window.
-    axes : (int, int) or (str, str), optional
-        Tuple of axes indices or names. Default (0, 1).
     pos : tuple(number, number), optional
         Figure position. ``int`` is interpreted as pixels,
         ``float`` is interpreted as fraction of screen size.
@@ -65,7 +62,6 @@ class ColorMeshPlot(PlotBase):
     def __init__(
         self,
         title=None,
-        axes=(0, 1),
         pos=None,
         size=None,
         update_interval=1,
@@ -73,7 +69,6 @@ class ColorMeshPlot(PlotBase):
     ):
         super().__init__(title, pos, size, update_interval, **plot_kwargs)
         self._time = None
-        self._axes_order = axes
         self._info = None
         self._mesh = None
         self._time_text = None
@@ -124,7 +119,7 @@ class ColorMeshPlot(PlotBase):
 
         if self.figure is None:
             self.create_figure()
-            self.axes.set_aspect("equal")
+            self._info.grid.axes.set_aspect("equal")
             self.figure.show()
 
         if not self.should_repaint():
@@ -133,7 +128,7 @@ class ColorMeshPlot(PlotBase):
         axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
         axes_indices = [
             ax if isinstance(ax, int) else axes_names[ax]
-            for ax in list(self._axes_order)
+            for ax in list(self._info.grid.axes)
         ]
 
         ax_1 = axes_indices[0]
@@ -144,29 +139,20 @@ class ColorMeshPlot(PlotBase):
         self.repaint(relim=False)
 
     def _plot_image(self, data, axes):
-        if axes == (0, 1):
-            data = data.transpose()
-        elif axes == (1, 0):
-            pass
-        else:
+        if axes != (0, 1) or axes != (1, 0):
             raise ValueError(f"Unsupported axes: {axes}")
-
-        if not self._info.grid.axes_increase[axes[0]]:
-            data = np.flip(data, axis=axes[0])
-        if not self._info.grid.axes_increase[axes[1]]:
-            data = np.flip(data, axis=axes[1])
 
         data_axes = [self._info.grid.axes[i] for i in axes]
 
         if self._mesh is None:
-            self._mesh = self.axes.pcolormesh(
+            self._mesh = self._info.grid.axes.pcolormesh(
                 data_axes[0],
                 data_axes[1],
                 data,
                 **self.plot_kwargs,
             )
             self._time_text = self.figure.text(0.5, 0.01, self._time, ha="center")
-            create_colorbar(self.figure, self.axes, self._mesh)
+            create_colorbar(self.figure, self._info.grid.axes, self._mesh)
             self.figure.tight_layout()
         else:
             self._mesh.set_array(data.ravel())

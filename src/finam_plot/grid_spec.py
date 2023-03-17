@@ -31,7 +31,6 @@ class GridSpecPlot(fm.Component):
         import finam_plot as fmp
 
         plot = fmp.GridSpecPlot(
-            axes=(0, 1),
             inputs=["Grid1", "Grid2"],
             colors=["red", "#ff00ee"],
         )
@@ -47,8 +46,6 @@ class GridSpecPlot(fm.Component):
         List on input names.
     title : str, optional
         Title for plot and window.
-    axes : (int, int) or (str, str), optional
-        Tuple of axes indices or names. Default (0, 1).
     colors : list of str, optional
         List of colors for the inputs. Uses matplotlib default colors by default.
     pos : tuple(number, number), optional
@@ -59,25 +56,12 @@ class GridSpecPlot(fm.Component):
         ``float`` is interpreted as fraction of screen size.
     """
 
-    def __init__(
-        self, inputs, title=None, axes=(0, 1), colors=None, pos=None, size=None
-    ):
+    def __init__(self, inputs, title=None, colors=None, pos=None, size=None):
         super().__init__()
         self._figure = None
         self._names = inputs
         self._title = title
-
-        if isinstance(axes, list):
-            if len(axes) != len(self._names):
-                raise ValueError(
-                    "Axes must be a tuple or a list of tuples with the same length as the inputs"
-                )
-            self._axes = dict(zip(self._names, axes))
-        else:
-            self._axes = dict(zip(self._names, [axes] * len(self._names)))
-
         self._colors = colors or [e["color"] for e in plt.rcParams["axes.prop_cycle"]]
-
         self._bounds = (pos, size)
         self._infos = {name: None for name in self._names}
 
@@ -133,7 +117,7 @@ class GridSpecPlot(fm.Component):
         axes_names = {name: i for i, name in enumerate(info.grid.axes_names)}
         axes_indices = [
             ax if isinstance(ax, int) else axes_names[ax]
-            for ax in list(self._axes[name])
+            for ax in list(self._info.grid.axes[name])
         ]
 
         ax_1 = axes_indices[0]

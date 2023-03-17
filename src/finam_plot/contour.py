@@ -45,7 +45,6 @@ class ContourPlot(PlotBase):
         import finam_plot as fmp
 
         plot = fmp.ContourPlot(
-            axes=(0, 1),
             fill=False,
             triangulate=True,
             vmin=0, vmax=1, cmap="hsv", # plot kwargs
@@ -60,8 +59,6 @@ class ContourPlot(PlotBase):
     ----------
     title : str, optional
         Title for plot and window.
-    axes : (int, int) or (str, str), optional
-        Tuple of axes indices or names. Default (0, 1).
     fill : bool, optional
         Whether to draw filled contours. Default ``True``.
     triangulate : bool, optional
@@ -81,7 +78,6 @@ class ContourPlot(PlotBase):
     def __init__(
         self,
         title=None,
-        axes=(0, 1),
         fill=True,
         triangulate=False,
         pos=None,
@@ -91,7 +87,6 @@ class ContourPlot(PlotBase):
     ):
         super().__init__(title, pos, size, update_interval, **plot_kwargs)
         self._time = None
-        self._axes_order = axes
         self._triangulate = triangulate
         self._fill = fill
         self._info = None
@@ -139,7 +134,7 @@ class ContourPlot(PlotBase):
         if self.figure is None:
             self.create_figure()
 
-            self.axes.set_aspect("equal")
+            self._info.grid.axes.set_aspect("equal")
             self._time_text = self.figure.text(0.5, 0.01, self._time, ha="center")
             self.figure.show()
         else:
@@ -147,14 +142,14 @@ class ContourPlot(PlotBase):
 
         first_plot = True
         if self._contours is not None:
-            self.axes.clear()
-            self.axes.set_title(self._title)
+            self._info.grid.axes.clear()
+            self._info.grid.axes.set_title(self._title)
             first_plot = False
 
         axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
         axes_indices = [
             ax if isinstance(ax, int) else axes_names[ax]
-            for ax in list(self._axes_order)
+            for ax in list(self._info.grid.axes)
         ]
 
         ax_1 = axes_indices[0]
@@ -166,25 +161,25 @@ class ContourPlot(PlotBase):
             self._plot_structured(data, (ax_1, ax_2))
 
         if first_plot:
-            create_colorbar(self.figure, self.axes, self._contours)
+            create_colorbar(self.figure, self._info.grid.axes, self._contours)
             self.figure.tight_layout()
 
         self.repaint(relim=False)
 
     def _plot_structured(self, data, axes):
-        if axes == (0, 1):
-            data = data.transpose()
-        elif axes == (1, 0):
-            pass
-        else:
+        if axes != (0, 1) or axes != (1, 0):
             raise ValueError(f"Unsupported axes: {axes}")
 
         data_axes = [self._info.grid.data_axes[i] for i in axes]
 
         if self._fill:
-            self._contours = self.axes.contourf(*data_axes, data, **self.plot_kwargs)
+            self._contours = self._info.grid.axes.contourf(
+                *data_axes, data, **self.plot_kwargs
+            )
         else:
-            self._contours = self.axes.contour(*data_axes, data, **self.plot_kwargs)
+            self._contours = self._info.grid.axes.contour(
+                *data_axes, data, **self.plot_kwargs
+            )
 
     def _plot_unstructured(self, data, axes):
         if self._info.grid.data_location == fm.Location.POINTS:
