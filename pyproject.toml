@@ -37,7 +37,7 @@ dependencies = [
     "matplotlib>=3",
     "numpy>=1.14.5",
     "xarray>=2022.03",
-    "finam",
+    "finam @ git+https://git.ufz.de/FINAM/finam.git",
 ]
 
 [project.urls]
