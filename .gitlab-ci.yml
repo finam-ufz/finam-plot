@@ -38,6 +38,18 @@ doctest:
     - sphinx-build -b dummy docs/source docs/build
     - sphinx-build -b doctest docs/source docs/build
 
+build:
+  stage: build
+  variables:
+    GIT_STRATEGY: clone
+    GIT_DEPTH: 0  # to have all tags
+  script:
+    - pip install build
+    - python -m build
+  artifacts:
+    paths:
+      - dist
+
 documentation:
   stage: build
   script:
