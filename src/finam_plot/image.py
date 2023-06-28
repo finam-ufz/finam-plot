@@ -2,10 +2,10 @@
 from datetime import datetime
 
 import finam as fm
-import numpy as np
 
 from .plot import PlotBase
 from .tools import create_colorbar
+
 
 class ImagePlot(PlotBase):
     """Raster image plot component for uniform grids.
@@ -117,55 +117,32 @@ class ImagePlot(PlotBase):
         if not self.should_repaint():
             return
 
-        axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
-        axes_indices = [
-            ax if isinstance(ax, int) else axes_names[ax]
-            for ax in list(self._info.grid.axes)
-        ]
-
-        ax_1 = axes_indices[0]
-        ax_2 = axes_indices[1]
-
         if self.figure is None:
             self.create_figure()
-            self._info.grid.axes.set_aspect("equal")
-
+            self.axes.set_aspect("equal")
             g = self._info.grid
-            self._extent = []
-
-            self._extent[0:1] = (
-                [g.axes[ax_1][0], g.axes[ax_1][-1]]
+            self._extent = (
+                [g.axes[0][0], g.axes[0][-1], g.axes[1][0], g.axes[1][-1]]
                 if g.data_location == fm.Location.CELLS
                 else [
-                    g.axes[ax_1][0] - g.spacing[ax_1] / 2,
-                    g.axes[ax_1][-1] + g.spacing[ax_1] / 2,
-                ]
-            )
-            self._extent[2:3] = (
-                [g.axes[ax_2][0], g.axes[ax_2][-1]]
-                if g.data_location == fm.Location.CELLS
-                else [
-                    g.axes[ax_2][0] - g.spacing[ax_2] / 2,
-                    g.axes[ax_2][-1] + g.spacing[ax_2] / 2,
+                    g.axes[0][0] - g.spacing[0] / 2,
+                    g.axes[0][-1] + g.spacing[0] / 2,
+                    g.axes[1][0] - g.spacing[1] / 2,
+                    g.axes[1][-1] + g.spacing[1] / 2,
                 ]
             )
             self.figure.show()
 
-        self._plot_image(data, (ax_1, ax_2))
-
+        self._plot_image(data)
         self.repaint(relim=False)
 
-    def _plot_image(self, data, axes):
-        if axes != (0, 1) or axes != (1, 0):
-            raise ValueError(f"Unsupported axes: {axes}")
-
-        if not self._info.grid.axes_increase[axes[0]]:
-            data = np.flip(data, axis=axes[0])
-        if not self._info.grid.axes_increase[axes[1]]:
-            data = np.flip(data, axis=axes[1])
+    def _plot_image(self, data):
+        g = self._info.grid
+        # transpose canonical data for imshow
+        data = g.to_canonical(data).T
 
         if self._image is None:
-            self._image = self._info.grid.axes.imshow(
+            self._image = self.axes.imshow(
                 data,
                 interpolation=None,
                 origin="lower",
@@ -174,7 +151,7 @@ class ImagePlot(PlotBase):
             )
             self._time_text = self.figure.text(0.5, 0.01, self._time, ha="center")
 
-            create_colorbar(self.figure, self._info.grid.axes, self._image)
+            create_colorbar(self.figure, self.axes, self._image)
             self.figure.tight_layout()
         else:
             self._image.set_data(data)
