@@ -2,7 +2,6 @@
 from datetime import datetime
 
 import finam as fm
-import numpy as np
 
 from .plot import PlotBase
 from .tools import create_colorbar
@@ -119,40 +118,27 @@ class ColorMeshPlot(PlotBase):
 
         if self.figure is None:
             self.create_figure()
-            self._info.grid.axes.set_aspect("equal")
+            self.axes.set_aspect("equal")
             self.figure.show()
 
         if not self.should_repaint():
             return
 
-        axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
-        axes_indices = [
-            ax if isinstance(ax, int) else axes_names[ax]
-            for ax in list(self._info.grid.axes)
-        ]
-
-        ax_1 = axes_indices[0]
-        ax_2 = axes_indices[1]
-
-        self._plot_image(data, (ax_1, ax_2))
-
+        self._plot_image(data)
         self.repaint(relim=False)
 
-    def _plot_image(self, data, axes):
-        if axes != (0, 1) or axes != (1, 0):
-            raise ValueError(f"Unsupported axes: {axes}")
-
-        data_axes = [self._info.grid.axes[i] for i in axes]
-
+    def _plot_image(self, data):
+        g = self._info.grid
+        data = g.to_canonical(data).T
         if self._mesh is None:
-            self._mesh = self._info.grid.axes.pcolormesh(
-                data_axes[0],
-                data_axes[1],
+            self._mesh = self.axes.pcolormesh(
+                g.axes[0],
+                g.axes[1],
                 data,
                 **self.plot_kwargs,
             )
             self._time_text = self.figure.text(0.5, 0.01, self._time, ha="center")
-            create_colorbar(self.figure, self._info.grid.axes, self._mesh)
+            create_colorbar(self.figure, self.axes, self._mesh)
             self.figure.tight_layout()
         else:
             self._mesh.set_array(data.ravel())
