@@ -45,7 +45,6 @@ class ContourPlot(PlotBase):
         import finam_plot as fmp
 
         plot = fmp.ContourPlot(
-            axes=(0, 1),
             fill=False,
             triangulate=True,
             vmin=0, vmax=1, cmap="hsv", # plot kwargs
@@ -60,8 +59,6 @@ class ContourPlot(PlotBase):
     ----------
     title : str, optional
         Title for plot and window.
-    axes : (int, int) or (str, str), optional
-        Tuple of axes indices or names. Default (0, 1).
     fill : bool, optional
         Whether to draw filled contours. Default ``True``.
     triangulate : bool, optional
@@ -81,7 +78,6 @@ class ContourPlot(PlotBase):
     def __init__(
         self,
         title=None,
-        axes=(0, 1),
         fill=True,
         triangulate=False,
         pos=None,
@@ -91,7 +87,6 @@ class ContourPlot(PlotBase):
     ):
         super().__init__(title, pos, size, update_interval, **plot_kwargs)
         self._time = None
-        self._axes_order = axes
         self._triangulate = triangulate
         self._fill = fill
         self._info = None
@@ -151,19 +146,10 @@ class ContourPlot(PlotBase):
             self.axes.set_title(self._title)
             first_plot = False
 
-        axes_names = {name: i for i, name in enumerate(self._info.grid.axes_names)}
-        axes_indices = [
-            ax if isinstance(ax, int) else axes_names[ax]
-            for ax in list(self._axes_order)
-        ]
-
-        ax_1 = axes_indices[0]
-        ax_2 = axes_indices[1]
-
         if isinstance(self._info.grid, fm.UnstructuredGrid):
-            self._plot_unstructured(data, (ax_1, ax_2))
+            self._plot_unstructured(data)
         else:
-            self._plot_structured(data, (ax_1, ax_2))
+            self._plot_structured(data)
 
         if first_plot:
             create_colorbar(self.figure, self.axes, self._contours)
@@ -171,26 +157,21 @@ class ContourPlot(PlotBase):
 
         self.repaint(relim=False)
 
-    def _plot_structured(self, data, axes):
-        if axes == (0, 1):
-            data = data.transpose()
-        elif axes == (1, 0):
-            pass
-        else:
-            raise ValueError(f"Unsupported axes: {axes}")
-
-        data_axes = [self._info.grid.data_axes[i] for i in axes]
-
+    def _plot_structured(self, data):
+        g = self._info.grid
+        data = g.to_canonical(data).T
+        axes = g.cell_axes if g.data_location == fm.Location.CELLS else g.axes
         if self._fill:
-            self._contours = self.axes.contourf(*data_axes, data, **self.plot_kwargs)
+            self._contours = self.axes.contourf(*axes[:2], data, **self.plot_kwargs)
         else:
-            self._contours = self.axes.contour(*data_axes, data, **self.plot_kwargs)
+            self._contours = self.axes.contour(*axes[:2], data, **self.plot_kwargs)
 
-    def _plot_unstructured(self, data, axes):
-        if self._info.grid.data_location == fm.Location.POINTS:
-            needs_triangulation = isinstance(
-                self._info.grid, fm.UnstructuredPoints
-            ) or any(tp != fm.CellType.TRI.value for tp in self._info.grid.cell_types)
+    def _plot_unstructured(self, data):
+        g = self._info.grid
+        if g.data_location == fm.Location.POINTS:
+            needs_triangulation = isinstance(g, fm.UnstructuredPoints) or any(
+                tp != fm.CellType.TRI.value for tp in g.cell_types
+            )
 
             if needs_triangulation and not self._triangulate:
                 with fm.tools.ErrorLogger(self.logger):
@@ -200,18 +181,14 @@ class ContourPlot(PlotBase):
 
             if self.triangulation is None:
                 if self._triangulate:
-                    self.triangulation = [
-                        Triangulation(*self._info.grid.data_points.T[list(axes)])
-                    ]
+                    self.triangulation = [Triangulation(*g.data_points.T[:2])]
                 else:
                     self.triangulation = [
-                        *self._info.grid.data_points.T[list(axes)],
-                        self._info.grid.cells,
+                        *g.data_points.T[:2],
+                        g.cells,
                     ]
 
-            data_flat = np.ascontiguousarray(
-                data.reshape(-1, order=self._info.grid.order)
-            )
+            data_flat = np.ascontiguousarray(data.reshape(-1, order=g.order))
             if self._fill:
                 self._contours = self.axes.tricontourf(
                     *self.triangulation, data_flat, **self.plot_kwargs
@@ -222,9 +199,7 @@ class ContourPlot(PlotBase):
                 )
         else:
             if self._fill:
-                tris_only = all(
-                    tp == fm.CellType.TRI.value for tp in self._info.grid.cell_types
-                )
+                tris_only = all(tp == fm.CellType.TRI.value for tp in g.cell_types)
 
                 if not tris_only:
                     with fm.tools.ErrorLogger(self.logger):
@@ -232,25 +207,19 @@ class ContourPlot(PlotBase):
                             "Contour plots for cell data are only supported for triangular meshes"
                         )
 
-                data_flat = np.ascontiguousarray(
-                    data.reshape(-1, order=self._info.grid.order)
-                )
+                data_flat = np.ascontiguousarray(data.reshape(-1, order=g.order))
 
                 self._contours = self.axes.tripcolor(
-                    *self._info.grid.points.T[list(axes)],
+                    *g.points.T[:2],
                     data_flat,
-                    triangles=self._info.grid.cells,
+                    triangles=g.cells,
                     **self.plot_kwargs,
                 )
             else:
                 if self.triangulation is None:
-                    self.triangulation = [
-                        Triangulation(*self._info.grid.data_points.T[list(axes)])
-                    ]
+                    self.triangulation = [Triangulation(*g.data_points.T[:2])]
 
-                data_flat = np.ascontiguousarray(
-                    data.reshape(-1, order=self._info.grid.order)
-                )
+                data_flat = np.ascontiguousarray(data.reshape(-1, order=g.order))
                 self._contours = self.axes.tricontour(
                     *self.triangulation, data_flat, **self.plot_kwargs
                 )
