@@ -114,26 +114,17 @@ class GridSpecPlot(fm.Component):
         points = info.grid.points
         cells = info.grid.cells
 
-        axes_names = {name: i for i, name in enumerate(info.grid.axes_names)}
-        axes_indices = [
-            ax if isinstance(ax, int) else axes_names[ax]
-            for ax in list(self._info.grid.axes[name])
-        ]
-
-        ax_1 = axes_indices[0]
-        ax_2 = axes_indices[1]
-
         if not isinstance(info.grid, fm.UnstructuredPoints):
-            self._plot_cells(axes, points, cells, axes_indices, color)
+            self._plot_cells(axes, points, cells, color)
 
-        axes.scatter(*data_points.T[[ax_1, ax_2]], marker="+", c=color)
+        axes.scatter(*data_points.T[:2], marker="+", c=color)
 
         if not isinstance(info.grid, fm.data.StructuredGrid):
             return
 
-        axes_inc = info.grid.axes_increase[[ax_1, ax_2]]
-        x_axis = info.grid.axes[ax_1]
-        y_axis = info.grid.axes[ax_2]
+        axes_inc = info.grid.axes_increase[:2]
+        x_axis = info.grid.axes[0]
+        y_axis = info.grid.axes[1]
         if not axes_inc[0]:
             x_axis = x_axis[::-1]
         if not axes_inc[1]:
@@ -164,16 +155,14 @@ class GridSpecPlot(fm.Component):
             length_includes_head=True,
         )
 
-    def _plot_cells(self, axes, points, cells, axes_indices, color):
-        ax_1 = axes_indices[0]
-        ax_2 = axes_indices[1]
+    def _plot_cells(self, axes, points, cells, color):
         for nodes in cells:
             for i, node in enumerate(nodes):
                 pt1 = points[node]
                 pt2 = points[nodes[(i + 1) % len(nodes)]]
                 axes.plot(
-                    [pt1[ax_1], pt2[ax_1]],
-                    [pt1[ax_2], pt2[ax_2]],
+                    [pt1[0], pt2[0]],
+                    [pt1[1], pt2[1]],
                     c=color,
                     lw=0.5,
                 )
