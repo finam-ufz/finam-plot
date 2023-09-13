@@ -177,7 +177,7 @@ class XyPlot(PlotBase):
 
             return raw[:, 0], raw[:, 1]
 
-        if isinstance(grid, fm.data.grid_tools.StructuredGrid):
+        if isinstance(grid, fm.data.StructuredGrid):
             return grid.data_axes[0], raw
 
         with fm.tools.ErrorLogger(self.logger):
