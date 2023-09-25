@@ -97,7 +97,9 @@ class ImagePlot(PlotBase):
                             "Only 2-D UniformGrid is supported in image plot."
                         )
                 else:
-                    raise ValueError("Only UniformGrid is supported in image plot.")
+                    raise ValueError(
+                        "Only UniformGrid is supported in image plot. Try using ColorMeshPlot or ContourPlot instead."
+                    )
 
     def _plot(self):
         try:

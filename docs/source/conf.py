@@ -16,6 +16,7 @@ author = "FINAM Developers"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
+    "myst_parser",
     "sphinx_design",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
@@ -104,7 +105,6 @@ intersphinx_mapping = {
     "Python": ("https://docs.python.org/", None),
     "NumPy": ("http://docs.scipy.org/doc/numpy/", None),
     "matplotlib": ("http://matplotlib.org/stable/", None),
-    "xarray": ("https://docs.xarray.dev/en/stable/", None),
     "pytest": ("https://docs.pytest.org/en/7.1.x/", None),
     "finam": ("https://finam.pages.ufz.de/finam/", None),
 }
