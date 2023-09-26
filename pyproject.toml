@@ -37,7 +37,7 @@ classifiers = [
 dependencies = [
     "matplotlib>=3",
     "numpy>=1.14.5",
-    "finam @ git+https://git.ufz.de/FINAM/finam.git@de3f0f0",
+    "finam>=0.5.0",
 ]
 
 [project.urls]
