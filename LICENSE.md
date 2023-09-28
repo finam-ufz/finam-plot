@@ -1,6 +1,6 @@
 # SOFTWARE LICENCE
 
-FINAM is an open-source component-based model coupling framework for environmental models.
+FINAM-plot provides live plotting components for the FINAM model coupling framework.
 
 ## Copyright Notice
 
@@ -13,7 +13,7 @@ Copyright © 2023, the FINAM developers from Helmholtz-Zentrum für Umweltforsch
 > Registration Office: Amtsgericht Leipzig<br/>
 > Trade Register Nr. B 4703<br/>
 
-The list of FINAM developers is provided in the AUTHORS.md file.
+The list of FINAM-plot developers is provided in the AUTHORS.md file.
 
 ***Contact:***
 

@@ -1,6 +1,6 @@
 # FINAM developers
 
-The FINAM project was created by the following people.
+The FINAM-plot project was created by the following people.
 
 ## Core developers
 
