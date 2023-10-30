@@ -31,6 +31,6 @@
 
 * initial release of finam_plot
 
-[unpublished]: https://git.ufz.de/FINAM/finam_plot/-/compare/v0.1.0...main
-[v0.2.0]: https://git.ufz.de/FINAM/finam_plot/-/compare/v0.1.0...v0.2.0
-[v0.1.0]: https://git.ufz.de/FINAM/finam_plot/-/commits/v0.1.0
+[unpublished]: https://git.ufz.de/FINAM/finam-plot/-/compare/v0.1.0...main
+[v0.2.0]: https://git.ufz.de/FINAM/finam-plot/-/compare/v0.1.0...v0.2.0
+[v0.1.0]: https://git.ufz.de/FINAM/finam-plot/-/commits/v0.1.0
