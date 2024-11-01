@@ -1,4 +1,5 @@
 """Components for contour plots"""
+
 from datetime import datetime
 
 import finam as fm
@@ -168,6 +169,8 @@ class ContourPlot(PlotBase):
 
     def _plot_unstructured(self, data):
         g = self._info.grid
+        if fm.data.is_masked_array(data):
+            data = data.filled(np.nan)
         if g.data_location == fm.Location.POINTS:
             needs_triangulation = isinstance(g, fm.UnstructuredPoints) or any(
                 tp != fm.CellType.TRI.value for tp in g.cell_types
