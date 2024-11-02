@@ -1,4 +1,5 @@
 """Time series visualization."""
+
 from datetime import datetime, timedelta
 
 import finam as fm
@@ -160,7 +161,11 @@ class TimeSeriesPlot(PlotBase):
                 self._lines = []
                 for i, n in enumerate(self._input_units):
                     units = self.inputs[n].info.meta.get("units")
-                    units = f" [{units}]" if units else ""
+                    units = (
+                        f" [{units}]"
+                        if units is not None and not units.dimensionless
+                        else ""
+                    )
                     self._lines.append(
                         self.axes.plot(
                             [],
@@ -351,7 +356,11 @@ class StepTimeSeriesPlot(fm.TimeComponent):
                 self._lines = []
                 for i, n in enumerate(self._input_units):
                     units = self.inputs[n].info.meta.get("units")
-                    units = f" [{units}]" if units else ""
+                    units = (
+                        f" [{units}]"
+                        if units is not None and not units.dimensionless
+                        else ""
+                    )
                     self._lines.append(
                         self._axes.plot(
                             [],
