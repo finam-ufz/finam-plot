@@ -46,7 +46,6 @@ class TestImage(unittest.TestCase):
         plot = ImagePlot(pos=(0.2, 0.2), size=(0.33, 0.4), vmin=0, vmax=1)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
@@ -94,7 +93,6 @@ class TestImage(unittest.TestCase):
         plot = ImagePlot(pos=(0.2, 0.2), size=(0.33, 0.4), vmin=0, vmax=1)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 

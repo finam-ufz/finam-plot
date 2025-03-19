@@ -31,7 +31,6 @@ class TestStepTimeSeries(unittest.TestCase):
         )
 
         comp = fm.Composition([gen1, gen2, series])
-        comp.initialize()
 
         gen1.outputs["Out"] >> series.inputs["Gen1"]
         gen2.outputs["Out"] >> series.inputs["Gen2"]
@@ -73,7 +72,6 @@ class TestPushTimeSeries(unittest.TestCase):
         series = TimeSeriesPlot(["Gen1", "Gen2"], colors=["red", "black"], marker="o")
 
         comp = fm.Composition([gen1, gen2, series])
-        comp.initialize()
 
         gen1.outputs["Out"] >> series.inputs["Gen1"]
         gen2.outputs["Out"] >> series.inputs["Gen2"]

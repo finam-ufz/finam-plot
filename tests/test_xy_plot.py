@@ -42,7 +42,6 @@ class TestLine(unittest.TestCase):
         plot = XyPlot(["In1", "In2"])
 
         comp = fm.Composition([source_1, source_2, trigger_1, trigger_2, plot])
-        comp.initialize()
 
         (
             source_1.outputs["Noise"]
@@ -79,7 +78,6 @@ class TestLine(unittest.TestCase):
         plot = XyPlot(["In1"])
 
         comp = fm.Composition([source_1, plot])
-        comp.initialize()
 
         (source_1.outputs["Out"] >> plot.inputs["In1"])
 
@@ -104,7 +102,6 @@ class TestLine(unittest.TestCase):
         plot = XyPlot(["In1"], ls="", marker="o")
 
         comp = fm.Composition([source_1, plot])
-        comp.initialize()
 
         (source_1.outputs["Out"] >> plot.inputs["In1"])
 

@@ -25,7 +25,6 @@ class TestSchedule(unittest.TestCase):
         schedule = SchedulePlot(["Gen1", "Gen2"])
 
         comp = fm.Composition([gen1, gen2, schedule])
-        comp.initialize()
 
         gen1.outputs["Out"] >> schedule.inputs["Gen1"]
         gen2.outputs["Out"] >> schedule.inputs["Gen2"]

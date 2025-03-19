@@ -36,7 +36,6 @@ if __name__ == "__main__":
     plot = SchedulePlot(["1d", "5d", "30d"])
 
     comp = fm.Composition([source_1, source_2, source_3, plot])
-    comp.initialize()
 
     source_1.outputs["Out"] >> source_2.inputs["In"]
     source_2.outputs["Out"] >> source_3.inputs["In"]

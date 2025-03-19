@@ -23,7 +23,6 @@ if __name__ == "__main__":
     plot = ContourPlot(title="Simplex noise", vmin=-1, vmax=1)
 
     comp = fm.Composition([source, trigger, plot])
-    comp.initialize()
 
     source.outputs["Noise"] >> trigger.inputs["In"]
     trigger.outputs["Out"] >> plot.inputs["Grid"]

@@ -38,7 +38,6 @@ class TestContour(unittest.TestCase):
         plot = ContourPlot(triangulate=True, cmap="hsv")
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
@@ -80,7 +79,6 @@ class TestContour(unittest.TestCase):
         plot = ContourPlot(fill=True, triangulate=False)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
@@ -126,7 +124,6 @@ class TestContour(unittest.TestCase):
         plot = ContourPlot(fill=True, triangulate=False)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
@@ -168,7 +165,6 @@ class TestContour(unittest.TestCase):
         plot = ContourPlot(triangulate=True)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
@@ -215,7 +211,6 @@ class TestContour(unittest.TestCase):
         plot = ContourPlot(triangulate=True)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
@@ -262,7 +257,6 @@ class TestContour(unittest.TestCase):
         plot = ContourPlot(fill=False, triangulate=True)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 

@@ -37,7 +37,6 @@ if __name__ == "__main__":
     plot = TimeSeriesPlot(["In1", "In2"])
 
     comp = fm.Composition([source_1, source_2, trigger_1, trigger_2, plot])
-    comp.initialize()
 
     source_1.outputs["Noise"] >> trigger_1.inputs["In"]
     source_2.outputs["Noise"] >> trigger_2.inputs["In"]

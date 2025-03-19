@@ -28,7 +28,6 @@ if __name__ == "__main__":
     )
 
     comp = fm.Composition([source, trigger, plot])
-    comp.initialize()
 
     (
         source.outputs["Noise"]

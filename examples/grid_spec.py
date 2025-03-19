@@ -42,7 +42,6 @@ if __name__ == "__main__":
     plot = GridSpecPlot(["In1", "In2"], title="Grids", colors=["black", "red"])
 
     comp = fm.Composition([source, plot])
-    comp.initialize()
 
     source.outputs["Out1"] >> plot.inputs["In1"]
     source.outputs["Out2"] >> plot.inputs["In2"]

@@ -26,7 +26,6 @@ if __name__ == "__main__":
     plot = ColorMeshPlot(title="Simplex noise", vmin=-1, vmax=1, cmap="hsv")
 
     comp = fm.Composition([source, trigger, plot])
-    comp.initialize()
 
     source.outputs["Noise"] >> trigger.inputs["In"]
     trigger.outputs["Out"] >> plot.inputs["Grid"]

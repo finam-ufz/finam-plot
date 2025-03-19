@@ -30,7 +30,6 @@ if __name__ == "__main__":
     )
 
     comp = fm.Composition([source, trigger, plot])
-    comp.initialize()
 
     source.outputs["Noise"] >> trigger.inputs["In"]
     trigger.outputs["Out"] >> plot.inputs["Grid"]

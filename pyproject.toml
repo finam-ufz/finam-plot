@@ -37,7 +37,7 @@ classifiers = [
 dependencies = [
     "matplotlib>=3",
     "numpy>=1.14.5",
-    "finam>=0.5.0",
+    "finam>=1.0.0",
 ]
 
 [project.urls]

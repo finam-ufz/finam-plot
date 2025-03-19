@@ -43,7 +43,6 @@ class TestGridSpec(unittest.TestCase):
         plot = GridSpecPlot(["In1", "In2"], colors=["black", "blue"])
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out1"] >> plot.inputs["In1"]
         source.outputs["Out2"] >> plot.inputs["In2"]

@@ -49,7 +49,6 @@ class TestColorMesh(unittest.TestCase):
         plot = ColorMeshPlot(vmin=0, vmax=1)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
@@ -100,7 +99,6 @@ class TestColorMesh(unittest.TestCase):
         plot = ColorMeshPlot(vmin=0, vmax=1)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 

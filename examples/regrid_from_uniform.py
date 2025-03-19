@@ -35,7 +35,6 @@ if __name__ == "__main__":
     )
 
     comp = fm.Composition([source, plot_orig, plot_unif, plot_points, specs])
-    comp.initialize()
 
     source.outputs["Noise"] >> plot_orig.inputs["Grid"]
     (source.outputs["Noise"] >> regrid_unif >> plot_unif.inputs["Grid"])
