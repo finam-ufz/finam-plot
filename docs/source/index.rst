@@ -27,7 +27,7 @@ in the GitLab repository for fully functional usage examples.
 
 Most plot components in this package are push-based and have no internal time step.
 In coupling setups where FINAM complains about dead links, it may be necessary to put a
-:class:`finam.modules.TimeTrigger` component before the plot component in question.
+:class:`finam.components.TimeTrigger` component before the plot component in question.
 
 API References
 --------------

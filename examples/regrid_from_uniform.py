@@ -13,7 +13,7 @@ if __name__ == "__main__":
     py = np.random.uniform(0, 16, 500)
     unstructured_grid = fm.UnstructuredPoints(list(zip(px, py)))
 
-    source = fm.modules.StaticSimplexNoise(
+    source = fm.components.StaticSimplexNoise(
         info=fm.Info(None, grid=in_grid, units=""),
         frequency=0.05,
         octaves=3,

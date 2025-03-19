@@ -23,7 +23,7 @@ def run_model():
         counter += 1
         return d
 
-    source = fm.modules.CallbackGenerator(
+    source = fm.components.CallbackGenerator(
         callbacks={
             "Out1": (gen_data, info1.copy()),
             "Out2": (gen_data, info1.copy()),

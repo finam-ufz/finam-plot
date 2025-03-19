@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 import finam as fm
 import numpy as np
-from finam.modules.generators import CallbackGenerator
+from finam.components.generators import CallbackGenerator
 from matplotlib import pyplot
 
 from finam_plot.colormesh import ColorMeshPlot

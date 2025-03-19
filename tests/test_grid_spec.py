@@ -25,7 +25,7 @@ class TestGridSpec(unittest.TestCase):
             * fm.UNITS.meter
         )
 
-        source = fm.modules.CallbackGenerator(
+        source = fm.components.CallbackGenerator(
             callbacks={
                 "Out1": (
                     lambda t: grid_1.copy(),

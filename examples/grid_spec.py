@@ -24,7 +24,7 @@ if __name__ == "__main__":
     grid_2 = (
         np.zeros(shape=info_2.grid.data_shape, order=info_2.grid.order) * fm.UNITS.meter
     )
-    source = fm.modules.CallbackGenerator(
+    source = fm.components.CallbackGenerator(
         callbacks={
             "Out1": (
                 lambda t: grid_1.copy(),

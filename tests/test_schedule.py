@@ -11,12 +11,12 @@ class TestSchedule(unittest.TestCase):
     def test_schedule(self):
         start = datetime(2000, 1, 1)
 
-        gen1 = fm.modules.CallbackGenerator(
+        gen1 = fm.components.CallbackGenerator(
             callbacks={"Out": (lambda t: 0, fm.Info(None, grid=fm.NoGrid()))},
             start=start,
             step=timedelta(days=1),
         )
-        gen2 = fm.modules.CallbackGenerator(
+        gen2 = fm.components.CallbackGenerator(
             callbacks={"Out": (lambda t: 0, fm.Info(None, grid=fm.NoGrid()))},
             start=start,
             step=timedelta(days=3),

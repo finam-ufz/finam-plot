@@ -14,19 +14,19 @@ if __name__ == "__main__":
     time = datetime(2000, 1, 1)
     info = fm.Info(None, grid=fm.NoGrid())
 
-    source_1 = fm.modules.CallbackGenerator(
+    source_1 = fm.components.CallbackGenerator(
         callbacks={"Out": (lambda t: 0, info)},
         start=time,
         step=timedelta(days=1),
     )
-    source_2 = fm.modules.CallbackComponent(
+    source_2 = fm.components.CallbackComponent(
         inputs={"In": info},
         outputs={"Out": info},
         callback=transform,
         start=time,
         step=timedelta(days=5),
     )
-    source_3 = fm.modules.CallbackComponent(
+    source_3 = fm.components.CallbackComponent(
         inputs={"In": info},
         outputs={"Out": info},
         callback=transform,

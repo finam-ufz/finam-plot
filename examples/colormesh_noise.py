@@ -11,14 +11,14 @@ if __name__ == "__main__":
     y = np.linspace(0, 19, 20) + np.random.uniform(-0.4, 0.4, (20,))
     grid = fm.RectilinearGrid([x, y], order="C")
 
-    source = fm.modules.SimplexNoise(
+    source = fm.components.SimplexNoise(
         info=fm.Info(None, grid=grid, units=""),
         frequency=0.05,
         time_frequency=1.0 / (30 * 24 * 3600),
         octaves=3,
         persistence=0.5,
     )
-    trigger = fm.modules.TimeTrigger(
+    trigger = fm.components.TimeTrigger(
         start=datetime(2000, 1, 1),
         step=timedelta(days=1),
         in_info=fm.Info(time=None, grid=None, units=None),

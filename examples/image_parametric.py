@@ -16,11 +16,11 @@ if __name__ == "__main__":
         t_func = math.sin(0.1 * days)
         return xy_func * t_func
 
-    source = fm.modules.ParametricGrid(
+    source = fm.components.ParametricGrid(
         info=fm.Info(None, grid=grid, units=""),
         func=func,
     )
-    trigger = fm.modules.TimeTrigger(
+    trigger = fm.components.TimeTrigger(
         start=start,
         step=timedelta(days=1),
         in_info=fm.Info(time=None, grid=None, units=None),
