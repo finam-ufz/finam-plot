@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 import finam as fm
 import numpy as np
-from finam.modules.generators import CallbackGenerator
+from finam.components.generators import CallbackGenerator
 from matplotlib import pyplot
 
 from finam_plot.colormesh import ColorMeshPlot
@@ -49,7 +49,6 @@ class TestColorMesh(unittest.TestCase):
         plot = ColorMeshPlot(vmin=0, vmax=1)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
@@ -100,7 +99,6 @@ class TestColorMesh(unittest.TestCase):
         plot = ColorMeshPlot(vmin=0, vmax=1)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 

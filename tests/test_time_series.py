@@ -11,14 +11,14 @@ class TestStepTimeSeries(unittest.TestCase):
     def test_step_time_series(self):
         start = datetime(2000, 1, 1)
 
-        gen1 = fm.modules.CallbackGenerator(
+        gen1 = fm.components.CallbackGenerator(
             callbacks={
                 "Out": (lambda t: 0, fm.Info(None, grid=fm.NoGrid(), units="m/s"))
             },
             start=start,
             step=timedelta(days=1),
         )
-        gen2 = fm.modules.CallbackGenerator(
+        gen2 = fm.components.CallbackGenerator(
             callbacks={
                 "Out": (lambda t: (t - start).days, fm.Info(None, grid=fm.NoGrid()))
             },
@@ -31,7 +31,6 @@ class TestStepTimeSeries(unittest.TestCase):
         )
 
         comp = fm.Composition([gen1, gen2, series])
-        comp.initialize()
 
         gen1.outputs["Out"] >> series.inputs["Gen1"]
         gen2.outputs["Out"] >> series.inputs["Gen2"]
@@ -55,14 +54,14 @@ class TestPushTimeSeries(unittest.TestCase):
     def test_push_time_series(self):
         start = datetime(2000, 1, 1)
 
-        gen1 = fm.modules.CallbackGenerator(
+        gen1 = fm.components.CallbackGenerator(
             callbacks={
                 "Out": (lambda t: 0, fm.Info(None, grid=fm.NoGrid(), units="m/s"))
             },
             start=start,
             step=timedelta(days=1),
         )
-        gen2 = fm.modules.CallbackGenerator(
+        gen2 = fm.components.CallbackGenerator(
             callbacks={
                 "Out": (lambda t: (t - start).days, fm.Info(None, grid=fm.NoGrid()))
             },
@@ -73,7 +72,6 @@ class TestPushTimeSeries(unittest.TestCase):
         series = TimeSeriesPlot(["Gen1", "Gen2"], colors=["red", "black"], marker="o")
 
         comp = fm.Composition([gen1, gen2, series])
-        comp.initialize()
 
         gen1.outputs["Out"] >> series.inputs["Gen1"]
         gen2.outputs["Out"] >> series.inputs["Gen2"]

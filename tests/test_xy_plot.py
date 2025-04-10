@@ -13,7 +13,7 @@ class TestLine(unittest.TestCase):
         start = datetime(2000, 1, 1)
         grid = fm.UniformGrid((20, 25))
 
-        source_1 = fm.modules.SimplexNoise(
+        source_1 = fm.components.SimplexNoise(
             info=fm.Info(None, grid=grid, units=""),
             frequency=0.05,
             time_frequency=1.0 / (100 * 24 * 3600),
@@ -21,7 +21,7 @@ class TestLine(unittest.TestCase):
             persistence=0.5,
             seed=0,
         )
-        source_2 = fm.modules.SimplexNoise(
+        source_2 = fm.components.SimplexNoise(
             info=fm.Info(None, grid=grid, units=""),
             frequency=0.05,
             time_frequency=1.0 / (100 * 24 * 3600),
@@ -29,12 +29,12 @@ class TestLine(unittest.TestCase):
             persistence=0.5,
             seed=1,
         )
-        trigger_1 = fm.modules.TimeTrigger(
+        trigger_1 = fm.components.TimeTrigger(
             start=start,
             step=timedelta(days=10),
             in_info=fm.Info(time=None, grid=None, units=None),
         )
-        trigger_2 = fm.modules.TimeTrigger(
+        trigger_2 = fm.components.TimeTrigger(
             start=start,
             step=timedelta(days=1),
             in_info=fm.Info(time=None, grid=None, units=None),
@@ -42,7 +42,6 @@ class TestLine(unittest.TestCase):
         plot = XyPlot(["In1", "In2"])
 
         comp = fm.Composition([source_1, source_2, trigger_1, trigger_2, plot])
-        comp.initialize()
 
         (
             source_1.outputs["Noise"]
@@ -66,7 +65,7 @@ class TestLine(unittest.TestCase):
         start = datetime(2000, 1, 1)
         grid = fm.NoGrid(dim=1)
 
-        source_1 = fm.modules.CallbackGenerator(
+        source_1 = fm.components.CallbackGenerator(
             callbacks={
                 "Out": (
                     lambda t: np.random.random((25,)),
@@ -79,7 +78,6 @@ class TestLine(unittest.TestCase):
         plot = XyPlot(["In1"])
 
         comp = fm.Composition([source_1, plot])
-        comp.initialize()
 
         (source_1.outputs["Out"] >> plot.inputs["In1"])
 
@@ -91,7 +89,7 @@ class TestLine(unittest.TestCase):
         start = datetime(2000, 1, 1)
         grid = fm.NoGrid(dim=2)
 
-        source_1 = fm.modules.CallbackGenerator(
+        source_1 = fm.components.CallbackGenerator(
             callbacks={
                 "Out": (
                     lambda t: np.random.random((25, 2)),
@@ -104,7 +102,6 @@ class TestLine(unittest.TestCase):
         plot = XyPlot(["In1"], ls="", marker="o")
 
         comp = fm.Composition([source_1, plot])
-        comp.initialize()
 
         (source_1.outputs["Out"] >> plot.inputs["In1"])
 

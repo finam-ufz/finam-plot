@@ -24,7 +24,7 @@ if __name__ == "__main__":
     grid_2 = (
         np.zeros(shape=info_2.grid.data_shape, order=info_2.grid.order) * fm.UNITS.meter
     )
-    source = fm.modules.CallbackGenerator(
+    source = fm.components.CallbackGenerator(
         callbacks={
             "Out1": (
                 lambda t: grid_1.copy(),
@@ -42,7 +42,6 @@ if __name__ == "__main__":
     plot = GridSpecPlot(["In1", "In2"], title="Grids", colors=["black", "red"])
 
     comp = fm.Composition([source, plot])
-    comp.initialize()
 
     source.outputs["Out1"] >> plot.inputs["In1"]
     source.outputs["Out2"] >> plot.inputs["In2"]

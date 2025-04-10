@@ -23,7 +23,7 @@ def run_model():
         counter += 1
         return d
 
-    source = fm.modules.CallbackGenerator(
+    source = fm.components.CallbackGenerator(
         callbacks={
             "Out1": (gen_data, info1.copy()),
             "Out2": (gen_data, info1.copy()),
@@ -34,7 +34,6 @@ def run_model():
     plot = TimeSeriesPlot(inputs=["In1", "In2"])
 
     composition = fm.Composition([source, plot])
-    composition.initialize()
 
     source["Out1"] >> plot["In1"]
     source["Out2"] >> plot["In2"]

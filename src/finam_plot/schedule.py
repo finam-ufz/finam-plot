@@ -163,7 +163,7 @@ class SchedulePlot(PlotBase):
 
         for i, line in enumerate(self._lines):
             line.set_xdata(self._x[i])
-            line.set_ydata(i)
+            line.set_ydata([i])
 
     def _finalize(self):
         """Finalize and clean up the component.

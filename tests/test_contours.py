@@ -24,7 +24,7 @@ class TestContour(unittest.TestCase):
         for i in range(points):
             grid[i] = i * fm.UNITS.meter
 
-        source = fm.modules.CallbackGenerator(
+        source = fm.components.CallbackGenerator(
             callbacks={
                 "Out": (
                     lambda t: grid.copy(),
@@ -38,7 +38,6 @@ class TestContour(unittest.TestCase):
         plot = ContourPlot(triangulate=True, cmap="hsv")
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
@@ -66,7 +65,7 @@ class TestContour(unittest.TestCase):
         for i in range(len(points)):
             grid[i] = np.random.uniform(0.0, 1.0, 1) * fm.UNITS.meter
 
-        source = fm.modules.CallbackGenerator(
+        source = fm.components.CallbackGenerator(
             callbacks={
                 "Out": (
                     lambda t: grid.copy(),
@@ -80,7 +79,6 @@ class TestContour(unittest.TestCase):
         plot = ContourPlot(fill=True, triangulate=False)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
@@ -112,7 +110,7 @@ class TestContour(unittest.TestCase):
                 grid[i] = np.random.uniform(0.0, 1.0, 1) * fm.UNITS.meter
             return grid
 
-        source = fm.modules.CallbackGenerator(
+        source = fm.components.CallbackGenerator(
             callbacks={
                 "Out": (
                     lambda t: generate_data(grid).copy(),
@@ -126,7 +124,6 @@ class TestContour(unittest.TestCase):
         plot = ContourPlot(fill=True, triangulate=False)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
@@ -154,7 +151,7 @@ class TestContour(unittest.TestCase):
         for i in range(len(points)):
             grid[i] = np.random.uniform(0.0, 1.0, 1) * fm.UNITS.meter
 
-        source = fm.modules.CallbackGenerator(
+        source = fm.components.CallbackGenerator(
             callbacks={
                 "Out": (
                     lambda t: grid.copy(),
@@ -168,7 +165,6 @@ class TestContour(unittest.TestCase):
         plot = ContourPlot(triangulate=True)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
@@ -201,7 +197,7 @@ class TestContour(unittest.TestCase):
                     grid[i, j] = np.random.uniform(0.0, 1.0, 1) * fm.UNITS.meter
             return grid
 
-        source = fm.modules.CallbackGenerator(
+        source = fm.components.CallbackGenerator(
             callbacks={
                 "Out": (
                     lambda t: generate_data(grid).copy(),
@@ -215,7 +211,6 @@ class TestContour(unittest.TestCase):
         plot = ContourPlot(triangulate=True)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
@@ -248,7 +243,7 @@ class TestContour(unittest.TestCase):
                     grid[i, j] = np.random.uniform(0.0, 1.0, 1) * fm.UNITS.meter
             return grid
 
-        source = fm.modules.CallbackGenerator(
+        source = fm.components.CallbackGenerator(
             callbacks={
                 "Out": (
                     lambda t: generate_data(grid).copy(),
@@ -262,7 +257,6 @@ class TestContour(unittest.TestCase):
         plot = ContourPlot(fill=False, triangulate=True)
 
         comp = fm.Composition([source, plot])
-        comp.initialize()
 
         source.outputs["Out"] >> plot.inputs["Grid"]
 
