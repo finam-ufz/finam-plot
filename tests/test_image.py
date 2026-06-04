@@ -24,7 +24,7 @@ class TestImage(unittest.TestCase):
             data = (
                 np.reshape(
                     np.random.random(info_1.grid.data_size),
-                    newshape=info_1.grid.data_shape,
+                    info_1.grid.data_shape,
                     order=grid.order,
                 )
                 * fm.UNITS.meter
@@ -68,7 +68,7 @@ class TestImage(unittest.TestCase):
         def generate_data(grid):
             arr = np.reshape(
                 np.random.random(info_1.grid.data_size),
-                newshape=info_1.grid.data_shape,
+                info_1.grid.data_shape,
                 order=grid.order,
             )
             data = fm.UNITS.Quantity(
