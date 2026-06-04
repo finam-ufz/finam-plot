@@ -4,7 +4,7 @@ FINAM-plot provides live plotting components for the FINAM model coupling framew
 
 ## Copyright Notice
 
-Copyright © 2023, the FINAM developers from Helmholtz-Zentrum für Umweltforschung GmbH - UFZ. All rights reserved.
+Copyright © 2021-2026, the FINAM developers from Helmholtz-Zentrum für Umweltforschung GmbH - UFZ. All rights reserved.
 
 ***The code is a property of:***
 
