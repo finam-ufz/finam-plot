@@ -19,6 +19,7 @@
 * fix ydata setting for newer mpl versions
 * Contour: fill masked data with nan for unstructured plot
 * time-series: fix units string gen
+* fix figure positioning with non-Tk GUI backends
 
 
 ## [v0.2.0]
