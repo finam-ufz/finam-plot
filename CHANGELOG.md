@@ -1,5 +1,26 @@
 # Release notes
 
+## [v0.3.0]
+
+### Features
+
+* compatible with FINAM v1
+
+### Breaking changes
+
+* migrate examples and tests from `fm.modules` to `fm.components` for FINAM v1
+
+### Documentation
+
+* update installation instructions for the PyPI package
+
+### Bugfixes
+
+* fix ydata setting for newer mpl versions
+* Contour: fill masked data with nan for unstructured plot
+* time-series: fix units string gen
+
+
 ## [v0.2.0]
 
 ### Features
@@ -31,6 +52,7 @@
 
 * initial release of finam_plot
 
-[unpublished]: https://git.ufz.de/FINAM/finam-plot/-/compare/v0.1.0...main
+[unpublished]: https://git.ufz.de/FINAM/finam-plot/-/compare/v0.3.0...main
+[v0.3.0]: https://git.ufz.de/FINAM/finam-plot/-/compare/v0.2.0...v0.3.0
 [v0.2.0]: https://git.ufz.de/FINAM/finam-plot/-/compare/v0.1.0...v0.2.0
 [v0.1.0]: https://git.ufz.de/FINAM/finam-plot/-/commits/v0.1.0
