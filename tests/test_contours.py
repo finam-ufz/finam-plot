@@ -63,7 +63,7 @@ class TestContour(unittest.TestCase):
         grid = np.zeros(shape=(len(points),)) * fm.UNITS.meter
 
         for i in range(len(points)):
-            grid[i] = np.random.uniform(0.0, 1.0, 1) * fm.UNITS.meter
+            grid[i] = np.random.uniform(0.0, 1.0) * fm.UNITS.meter
 
         source = fm.components.CallbackGenerator(
             callbacks={
@@ -107,7 +107,7 @@ class TestContour(unittest.TestCase):
 
         def generate_data(grid):
             for i in range(len(cells)):
-                grid[i] = np.random.uniform(0.0, 1.0, 1) * fm.UNITS.meter
+                grid[i] = np.random.uniform(0.0, 1.0) * fm.UNITS.meter
             return grid
 
         source = fm.components.CallbackGenerator(
@@ -149,7 +149,7 @@ class TestContour(unittest.TestCase):
         grid = np.zeros(shape=(len(points),)) * fm.UNITS.meter
 
         for i in range(len(points)):
-            grid[i] = np.random.uniform(0.0, 1.0, 1) * fm.UNITS.meter
+            grid[i] = np.random.uniform(0.0, 1.0) * fm.UNITS.meter
 
         source = fm.components.CallbackGenerator(
             callbacks={
@@ -194,7 +194,7 @@ class TestContour(unittest.TestCase):
         def generate_data(grid):
             for i in range(len(info_1.grid.axes[0])):
                 for j in range(len(info_1.grid.axes[1])):
-                    grid[i, j] = np.random.uniform(0.0, 1.0, 1) * fm.UNITS.meter
+                    grid[i, j] = np.random.uniform(0.0, 1.0) * fm.UNITS.meter
             return grid
 
         source = fm.components.CallbackGenerator(
@@ -240,7 +240,7 @@ class TestContour(unittest.TestCase):
         def generate_data(grid):
             for i in range(len(info_1.grid.axes[0])):
                 for j in range(len(info_1.grid.axes[1])):
-                    grid[i, j] = np.random.uniform(0.0, 1.0, 1) * fm.UNITS.meter
+                    grid[i, j] = np.random.uniform(0.0, 1.0) * fm.UNITS.meter
             return grid
 
         source = fm.components.CallbackGenerator(

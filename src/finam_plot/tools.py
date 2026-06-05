@@ -41,7 +41,10 @@ def convert_pos(position):
         return None
 
     window = manager.window
-    screen_x, screen_y = window.wm_maxsize()
+    screen_size = _get_screen_size(window)
+    if screen_size is None:
+        return position if all(isinstance(p, int) for p in position) else None
+    screen_x, screen_y = screen_size
 
     return (
         position[0] if isinstance(position[0], int) else int(position[0] * screen_x),
@@ -60,10 +63,14 @@ def convert_size(position):
         return None
 
     window = manager.window
-    dpi = window.winfo_fpixels("1i")
+    screen_size = _get_screen_size(window)
+    if screen_size is None:
+        return None
+
+    dpi = _get_screen_dpi(window)
     scale = dpi / 96
 
-    screen_x, screen_y = window.wm_maxsize()
+    screen_x, screen_y = screen_size
     screen_x /= scale
     screen_y /= scale
 
@@ -78,6 +85,37 @@ def convert_size(position):
         pos[0] * px,
         pos[1] * px,
     )
+
+
+def _get_screen_size(window):
+    """Get the screen size in pixels for common GUI backends."""
+    if hasattr(window, "wm_maxsize"):
+        return window.wm_maxsize()
+
+    if hasattr(window, "screen"):
+        screen = window.screen()
+        if screen is not None:
+            geometry = screen.availableGeometry()
+            return geometry.width(), geometry.height()
+
+    if hasattr(window, "GetScreenRect"):
+        rect = window.GetScreenRect()
+        return rect.width, rect.height
+
+    return None
+
+
+def _get_screen_dpi(window):
+    """Get the screen DPI for common GUI backends."""
+    if hasattr(window, "winfo_fpixels"):
+        return window.winfo_fpixels("1i")
+
+    if hasattr(window, "screen"):
+        screen = window.screen()
+        if screen is not None and hasattr(screen, "logicalDotsPerInch"):
+            return screen.logicalDotsPerInch()
+
+    return 96
 
 
 def move_figure(f, pos):
